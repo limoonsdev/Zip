@@ -263,6 +263,7 @@ async function createOrdersTable() {
       duration INTEGER NOT NULL,
       price DECIMAL(10, 2) NOT NULL,
       currency VARCHAR(10) NOT NULL,
+      paypal_order_id VARCHAR(100),
       payment_method VARCHAR(50),
       payment_proof VARCHAR(255),
       status VARCHAR(50) DEFAULT 'PENDING',
@@ -277,6 +278,10 @@ async function createOrdersTable() {
   
   try {
     await query(`ALTER TABLE orders ADD COLUMN payment_proof VARCHAR(255)`);
+  } catch (e) {}
+
+  try {
+    await query(`ALTER TABLE orders ADD COLUMN paypal_order_id VARCHAR(100)`);
   } catch (e) {}
 }
 
