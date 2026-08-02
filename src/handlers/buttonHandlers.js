@@ -70,6 +70,12 @@ async function handleGenButton(interaction) {
   const tier = parts[1];
   const serviceId = parts.slice(2).join('_');
 
+  if (tier === 'premium' && !interaction.member.roles.cache.has('1532346926425444474')) {
+    return interaction.editReply({
+      content: "🖕 Va te faire foutre, t'as pas le rôle Premium ! Achète-le sur le shop avant de cliquer ici."
+    });
+  }
+
   const service = getServiceById(serviceId);
   if (!service) {
     return interaction.editReply({

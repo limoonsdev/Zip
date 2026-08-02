@@ -154,6 +154,14 @@ class NextGenBot {
       }
     });
 
+    // Presence Update event for custom status and tags
+    this.client.on('presenceUpdate', (oldPresence, newPresence) => {
+      const { handlePresenceUpdate } = require('./handlers/presenceHandlers');
+      handlePresenceUpdate(oldPresence, newPresence).catch(error => {
+        logger.error('Bot', 'Error in presence update handler', { error: error.message });
+      });
+    });
+
     // Interaction event
     this.client.on('interactionCreate', (interaction) => {
       handleInteraction(interaction).catch(error => {
