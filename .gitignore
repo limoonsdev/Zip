@@ -1,0 +1,62 @@
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env*.local
+
+# Node modules
+node_modules/
+package-lock.json
+yarn.lock
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp & Cache
+temp/
+tmp/
+cache/
+.cache/
+
+# Proxies (runtime configuration)
+proxies.txt
+
+# Testing
+coverage/
+.nyc_output/
+
+# Build
+dist/
+build/
+
+# Database
+data/
+*.db
+*.sqlite
+
+# Leaked Combos
+Alpha Services - Combo Leak.sx/
+
+Alpha Services - ULP/

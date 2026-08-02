@@ -1,0 +1,633 @@
+/**
+ * =====================================================
+ * /CONFIG COMMAND - Complete Bot Configuration
+ * =====================================================
+ * Interactive configuration system for all bot settings
+ */
+
+const {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  StringSelectMenuBuilder,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+  PermissionFlagsBits
+} = require('discord.js');
+const { getLogger } = require('../utils/logger');
+const { isAdmin } = require('../utils/roles');
+const { parseTime, formatTime } = require('../utils/timeParser');
+
+const logger = getLogger();
+
+const command = new SlashCommandBuilder()
+  .setName('config')
+  .setDescription('Configure bot settings')
+  .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+  .setDMPermission(false);
+
+/**
+ * Execute command
+ */
+async function execute(interaction) {
+  if (!isAdmin(interaction.member)) {
+    return await interaction.reply({
+      content: '❌ You need Administrator permission to use this command.',
+      ephemeral: true
+    });
+  }
+
+  await showConfigMenu(interaction);
+}
+
+/**
+ * Show main config menu
+ */
+async function showConfigMenu(interaction, isUpdate = false) {
+  const { getOrCreateGuildConfig } = require('../database/models');
+  const guildConfig = await getOrCreateGuildConfig(interaction.guild.id);
+  const config = guildConfig.config_data || {};
+
+  const embed = new EmbedBuilder()
+    .setColor(0x5865F2)
+    .setTitle('⚙️ Bot Configuration Panel')
+    .setDescription('**Current Configuration:**')
+    .addFields(
+      {
+        name: '⏱️ Cooldowns',
+        value: 
+          `Free: ${formatTime(config.cooldown_free || 30000)}\n` +
+          `Premium: ${formatTime(config.cooldown_premium || 10000)}`,
+        inline: true
+      },
+      {
+        name: '📊 Daily Limits',
+        value: 
+          `Free: ${config.daily_limit_free || 10} gen/day\n` +
+          `Premium: ${config.daily_limit_premium || 50} gen/day`,
+        inline: true
+      },
+      {
+        name: '🎭 Roles',
+        value:
+          `Free: ${config.role_free ? `<@&${config.role_free}>` : 'Not set'}\n` +
+          `Premium: ${config.role_premium ? `<@&${config.role_premium}>` : 'Not set'}`,
+        inline: true
+      },
+      {
+        name: '✅ Verification',
+        value: config.verification_enabled ? '✅ Enabled' : '❌ Disabled',
+        inline: true
+      },
+      {
+        name: '🔒 Security',
+        value: `Anti-raid: ${config.antiraid_enabled ? '✅' : '❌'}\nVPN Check: ${config.vpn_check ? '✅' : '❌'}`,
+        inline: true
+      },
+      {
+        name: '📝 Logs',
+        value: config.log_channel ? `<#${config.log_channel}>` : 'Not set',
+        inline: true
+      }
+    )
+    .setFooter({ text: 'Select a category to configure' })
+    .setTimestamp();
+
+  const selectMenu = new StringSelectMenuBuilder()
+    .setCustomId('config_select_category')
+    .setPlaceholder('Choose a configuration category')
+    .addOptions([
+      {
+        label: 'Cooldowns',
+        description: 'Configure generation cooldowns',
+        value: 'cooldowns',
+        emoji: '⏱️'
+      },
+      {
+        label: 'Daily Limits',
+        description: 'Set daily generation limits',
+        value: 'limits',
+        emoji: '📊'
+      },
+      {
+        label: 'Roles',
+        description: 'Configure required roles',
+        value: 'roles',
+        emoji: '🎭'
+      },
+      {
+        label: 'Verification',
+        description: 'Setup verification system',
+        value: 'verification',
+        emoji: '✅'
+      },
+      {
+        label: 'Security',
+        description: 'Anti-raid and security settings',
+        value: 'security',
+        emoji: '🔒'
+      },
+      {
+        label: 'Logs',
+        description: 'Configure logging channel',
+        value: 'logs',
+        emoji: '📝'
+      }
+    ]);
+
+  const row = new ActionRowBuilder().addComponents(selectMenu);
+
+  if (isUpdate) {
+    await interaction.update({ embeds: [embed], components: [row] });
+  } else {
+    await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
+  }
+}
+
+/**
+ * Handle category selection
+ */
+async function handleCategorySelection(interaction) {
+  const category = interaction.values[0];
+
+  switch (category) {
+    case 'cooldowns':
+      await showCooldownsConfig(interaction);
+      break;
+    case 'limits':
+      await showLimitsConfig(interaction);
+      break;
+    case 'roles':
+      await showRolesConfig(interaction);
+      break;
+    case 'verification':
+      await showVerificationConfig(interaction);
+      break;
+    case 'security':
+      await showSecurityConfig(interaction);
+      break;
+    case 'logs':
+      await showLogsConfig(interaction);
+      break;
+  }
+}
+
+/**
+ * Show cooldowns configuration
+ */
+async function showCooldownsConfig(interaction) {
+  const embed = new EmbedBuilder()
+    .setColor(0x5865F2)
+    .setTitle('⏱️ Cooldown Configuration')
+    .setDescription(
+      'Configure how long users must wait between generations.\n\n' +
+      '**Format examples:**\n' +
+      '• `30s` or `30` = 30 seconds\n' +
+      '• `1m` or `60s` = 1 minute\n' +
+      '• `1h` or `60m` = 1 hour\n' +
+      '• `2h 30m` = 2.5 hours'
+    )
+    .addFields(
+      {
+        name: 'Current Settings',
+        value: 'Click a button below to change cooldown',
+        inline: false
+      }
+    );
+
+  const row = new ActionRowBuilder()
+    .addComponents(
+      new ButtonBuilder()
+        .setCustomId('config_cooldown_free')
+        .setLabel('Free Cooldown')
+        .setStyle(ButtonStyle.Secondary)
+        .setEmoji('🆓'),
+      new ButtonBuilder()
+        .setCustomId('config_cooldown_premium')
+        .setLabel('Premium Cooldown')
+        .setStyle(ButtonStyle.Primary)
+        .setEmoji('👑'),
+      new ButtonBuilder()
+        .setCustomId('config_back')
+        .setLabel('Back')
+        .setStyle(ButtonStyle.Danger)
+        .setEmoji('◀️')
+    );
+
+  await interaction.update({ embeds: [embed], components: [row] });
+}
+
+/**
+ * Show limits configuration
+ */
+async function showLimitsConfig(interaction) {
+  const embed = new EmbedBuilder()
+    .setColor(0x5865F2)
+    .setTitle('📊 Daily Limits Configuration')
+    .setDescription(
+      'Set how many times users can generate per day.\n\n' +
+      '**Examples:**\n' +
+      '• `10` = 10 generations per day\n' +
+      '• `0` = unlimited\n' +
+      '• `-1` = disabled'
+    );
+
+  const row = new ActionRowBuilder()
+    .addComponents(
+      new ButtonBuilder()
+        .setCustomId('config_limit_free')
+        .setLabel('Free Limit')
+        .setStyle(ButtonStyle.Secondary)
+        .setEmoji('🆓'),
+      new ButtonBuilder()
+        .setCustomId('config_limit_premium')
+        .setLabel('Premium Limit')
+        .setStyle(ButtonStyle.Primary)
+        .setEmoji('👑'),
+      new ButtonBuilder()
+        .setCustomId('config_back')
+        .setLabel('Back')
+        .setStyle(ButtonStyle.Danger)
+        .setEmoji('◀️')
+    );
+
+  await interaction.update({ embeds: [embed], components: [row] });
+}
+
+/**
+ * Show roles configuration
+ */
+async function showRolesConfig(interaction) {
+  const embed = new EmbedBuilder()
+    .setColor(0x5865F2)
+    .setTitle('🎭 Roles Configuration')
+    .setDescription('Configure which roles are required to use Free and Premium generators.');
+
+  const row = new ActionRowBuilder()
+    .addComponents(
+      new ButtonBuilder()
+        .setCustomId('config_role_free')
+        .setLabel('Free Role')
+        .setStyle(ButtonStyle.Secondary)
+        .setEmoji('🆓'),
+      new ButtonBuilder()
+        .setCustomId('config_role_premium')
+        .setLabel('Premium Role')
+        .setStyle(ButtonStyle.Primary)
+        .setEmoji('👑'),
+      new ButtonBuilder()
+        .setCustomId('config_back')
+        .setLabel('Back')
+        .setStyle(ButtonStyle.Danger)
+        .setEmoji('◀️')
+    );
+
+  await interaction.update({ embeds: [embed], components: [row] });
+}
+
+/**
+ * Show verification configuration
+ */
+async function showVerificationConfig(interaction) {
+  const { getOrCreateGuildConfig } = require('../database/models');
+  const guildConfig = await getOrCreateGuildConfig(interaction.guild.id);
+  const config = guildConfig.config_data || {};
+
+  const embed = new EmbedBuilder()
+    .setColor(0x5865F2)
+    .setTitle('✅ Verification Configuration')
+    .setDescription('Manage verification system and security features.')
+    .addFields(
+      {
+        name: 'Status',
+        value: config.verification_enabled ? '✅ Enabled' : '❌ Disabled',
+        inline: true
+      },
+      {
+        name: 'Verified Role',
+        value: config.verified_role ? `<@&${config.verified_role}>` : 'Not set',
+        inline: true
+      }
+    );
+
+  const row1 = new ActionRowBuilder()
+    .addComponents(
+      new ButtonBuilder()
+        .setCustomId('config_verification_toggle')
+        .setLabel(config.verification_enabled ? 'Disable' : 'Enable')
+        .setStyle(config.verification_enabled ? ButtonStyle.Danger : ButtonStyle.Success)
+        .setEmoji(config.verification_enabled ? '❌' : '✅'),
+      new ButtonBuilder()
+        .setCustomId('config_verification_role')
+        .setLabel('Set Verified Role')
+        .setStyle(ButtonStyle.Secondary)
+        .setEmoji('🎭')
+    );
+
+  const row2 = new ActionRowBuilder()
+    .addComponents(
+      new ButtonBuilder()
+        .setCustomId('config_verification_cleanup')
+        .setLabel('Pull Left Members')
+        .setStyle(ButtonStyle.Primary)
+        .setEmoji('🔄'),
+      new ButtonBuilder()
+        .setCustomId('config_back')
+        .setLabel('Back')
+        .setStyle(ButtonStyle.Danger)
+        .setEmoji('◀️')
+    );
+
+  await interaction.update({ embeds: [embed], components: [row1, row2] });
+}
+
+/**
+ * Show security configuration
+ */
+async function showSecurityConfig(interaction) {
+  const { getOrCreateGuildConfig } = require('../database/models');
+  const guildConfig = await getOrCreateGuildConfig(interaction.guild.id);
+  const config = guildConfig.config_data || {};
+
+  const embed = new EmbedBuilder()
+    .setColor(0x5865F2)
+    .setTitle('🔒 Security Configuration')
+    .setDescription('Advanced security features to protect your server.')
+    .addFields(
+      {
+        name: 'Anti-Raid',
+        value: config.antiraid_enabled ? '✅ Enabled' : '❌ Disabled',
+        inline: true
+      },
+      {
+        name: 'VPN Detection',
+        value: config.vpn_check ? '✅ Enabled' : '❌ Disabled',
+        inline: true
+      }
+    );
+
+  const row = new ActionRowBuilder()
+    .addComponents(
+      new ButtonBuilder()
+        .setCustomId('config_security_antiraid')
+        .setLabel('Toggle Anti-Raid')
+        .setStyle(ButtonStyle.Secondary)
+        .setEmoji('🛡️'),
+      new ButtonBuilder()
+        .setCustomId('config_security_vpn')
+        .setLabel('Toggle VPN Check')
+        .setStyle(ButtonStyle.Secondary)
+        .setEmoji('🔍'),
+      new ButtonBuilder()
+        .setCustomId('config_back')
+        .setLabel('Back')
+        .setStyle(ButtonStyle.Danger)
+        .setEmoji('◀️')
+    );
+
+  await interaction.update({ embeds: [embed], components: [row] });
+}
+
+/**
+ * Show logs configuration
+ */
+async function showLogsConfig(interaction) {
+  const embed = new EmbedBuilder()
+    .setColor(0x5865F2)
+    .setTitle('📝 Logs Configuration')
+    .setDescription('Configure where bot logs should be sent.');
+
+  const row = new ActionRowBuilder()
+    .addComponents(
+      new ButtonBuilder()
+        .setCustomId('config_logs_channel')
+        .setLabel('Set Log Channel')
+        .setStyle(ButtonStyle.Primary)
+        .setEmoji('📝'),
+      new ButtonBuilder()
+        .setCustomId('config_back')
+        .setLabel('Back')
+        .setStyle(ButtonStyle.Danger)
+        .setEmoji('◀️')
+    );
+
+  await interaction.update({ embeds: [embed], components: [row] });
+}
+
+/**
+ * Show modal for cooldown input
+ */
+async function showCooldownModal(interaction, tier) {
+  const modal = new ModalBuilder()
+    .setCustomId(`config_modal_cooldown_${tier}`)
+    .setTitle(`Configure ${tier === 'free' ? 'Free' : 'Premium'} Cooldown`);
+
+  const input = new TextInputBuilder()
+    .setCustomId('cooldown_value')
+    .setLabel('Cooldown Duration')
+    .setStyle(TextInputStyle.Short)
+    .setPlaceholder('Examples: 30s, 1m, 1h, 2h 30m')
+    .setRequired(true);
+
+  const row = new ActionRowBuilder().addComponents(input);
+  modal.addComponents(row);
+
+  await interaction.showModal(modal);
+}
+
+/**
+ * Show modal for limit input
+ */
+async function showLimitModal(interaction, tier) {
+  const modal = new ModalBuilder()
+    .setCustomId(`config_modal_limit_${tier}`)
+    .setTitle(`Configure ${tier === 'free' ? 'Free' : 'Premium'} Daily Limit`);
+
+  const input = new TextInputBuilder()
+    .setCustomId('limit_value')
+    .setLabel('Daily Limit')
+    .setStyle(TextInputStyle.Short)
+    .setPlaceholder('Examples: 10, 50, 0 (unlimited)')
+    .setRequired(true);
+
+  const row = new ActionRowBuilder().addComponents(input);
+  modal.addComponents(row);
+
+  await interaction.showModal(modal);
+}
+
+/**
+ * Show modal for role ID input
+ */
+async function showRoleModal(interaction, type) {
+  const modal = new ModalBuilder()
+    .setCustomId(`config_modal_role_${type}`)
+    .setTitle(`Configure ${type.charAt(0).toUpperCase() + type.slice(1)} Role`);
+
+  const input = new TextInputBuilder()
+    .setCustomId('role_id_value')
+    .setLabel('Role ID')
+    .setStyle(TextInputStyle.Short)
+    .setPlaceholder('Enter the Discord Role ID (e.g. 123456789012345678)')
+    .setRequired(true);
+
+  const row = new ActionRowBuilder().addComponents(input);
+  modal.addComponents(row);
+
+  await interaction.showModal(modal);
+}
+
+/**
+ * Show modal for channel ID input
+ */
+async function showChannelModal(interaction, type) {
+  const modal = new ModalBuilder()
+    .setCustomId(`config_modal_channel_${type}`)
+    .setTitle(`Configure ${type.charAt(0).toUpperCase() + type.slice(1)} Channel`);
+
+  const input = new TextInputBuilder()
+    .setCustomId('channel_id_value')
+    .setLabel('Channel ID')
+    .setStyle(TextInputStyle.Short)
+    .setPlaceholder('Enter the Discord Channel ID')
+    .setRequired(true);
+
+  const row = new ActionRowBuilder().addComponents(input);
+  modal.addComponents(row);
+
+  await interaction.showModal(modal);
+}
+
+/**
+ * Toggle a boolean config setting
+ */
+async function toggleConfigSetting(interaction, settingKey) {
+  const { getOrCreateGuildConfig, updateGuildConfig } = require('../database/models');
+  const guildConfig = await getOrCreateGuildConfig(interaction.guild.id);
+  const config = guildConfig.config_data || {};
+  
+  const newValue = !config[settingKey];
+  await updateGuildConfig(interaction.guild.id, { [settingKey]: newValue });
+  
+  await interaction.reply({
+    content: `✅ **${settingKey.replace('_', ' ')}** has been ${newValue ? 'enabled' : 'disabled'}.`,
+    ephemeral: true
+  });
+  
+  // Refresh menu
+  await showConfigMenu(interaction, true).catch(() => {});
+}
+
+/**
+ * Handle modal submit
+ */
+async function handleModalSubmit(interaction) {
+  const [, , type, tier] = interaction.customId.split('_');
+  const { updateGuildConfig } = require('../database/models');
+
+  if (type === 'cooldown') {
+    const value = interaction.fields.getTextInputValue('cooldown_value');
+    const ms = parseTime(value);
+
+    if (!ms) {
+      return await interaction.reply({
+        content: `❌ Invalid time format. Use: 30s, 1m, 1h, etc.`,
+        ephemeral: true
+      });
+    }
+
+    const key = `cooldown_${tier}`;
+    await updateGuildConfig(interaction.guild.id, { [key]: ms });
+
+    await interaction.reply({
+      content: `✅ ${tier === 'free' ? 'Free' : 'Premium'} cooldown set to **${formatTime(ms)}**`,
+      ephemeral: true
+    });
+
+    logger.info('Config', `Cooldown updated: ${tier} = ${formatTime(ms)}`, {
+      guild: interaction.guild.name,
+      user: interaction.user.tag
+    });
+  } else if (type === 'limit') {
+    const value = parseInt(interaction.fields.getTextInputValue('limit_value'));
+
+    if (isNaN(value) || value < -1) {
+      return await interaction.reply({
+        content: `❌ Invalid number. Use a positive number or 0 for unlimited.`,
+        ephemeral: true
+      });
+    }
+
+    const key = `daily_limit_${tier}`;
+    await updateGuildConfig(interaction.guild.id, { [key]: value });
+
+    await interaction.reply({
+      content: `✅ ${tier === 'free' ? 'Free' : 'Premium'} daily limit set to **${value}** ${value === 0 ? '(unlimited)' : 'generations/day'}`,
+      ephemeral: true
+    });
+
+    logger.info('Config', `Daily limit updated: ${tier} = ${value}`, {
+      guild: interaction.guild.name,
+      user: interaction.user.tag
+    });
+  } else if (type === 'role') {
+    const value = interaction.fields.getTextInputValue('role_id_value');
+    if (!/^\d{17,20}$/.test(value)) {
+      return await interaction.reply({ content: `❌ Invalid Role ID.`, ephemeral: true });
+    }
+    let key = `role_${tier}`;
+    if (tier === 'verified') key = 'verified_role';
+    
+    await updateGuildConfig(interaction.guild.id, { [key]: value });
+    await interaction.reply({ content: `✅ Role set successfully!`, ephemeral: true });
+  } else if (type === 'channel') {
+    const value = interaction.fields.getTextInputValue('channel_id_value');
+    if (!/^\d{17,20}$/.test(value)) {
+      return await interaction.reply({ content: `❌ Invalid Channel ID.`, ephemeral: true });
+    }
+    let key = `log_channel`; // since logs is the only one for now
+    await updateGuildConfig(interaction.guild.id, { [key]: value });
+    await interaction.reply({ content: `✅ Channel set successfully!`, ephemeral: true });
+  }
+}
+
+/**
+ * Handle config buttons
+ */
+async function handleConfigButton(interaction) {
+  const customId = interaction.customId;
+  
+  if (customId === 'config_cooldown_free') return await showCooldownModal(interaction, 'free');
+  if (customId === 'config_cooldown_premium') return await showCooldownModal(interaction, 'premium');
+  if (customId === 'config_limit_free') return await showLimitModal(interaction, 'free');
+  if (customId === 'config_limit_premium') return await showLimitModal(interaction, 'premium');
+  if (customId === 'config_role_free') return await showRoleModal(interaction, 'free');
+  if (customId === 'config_role_premium') return await showRoleModal(interaction, 'premium');
+  if (customId === 'config_verification_role') return await showRoleModal(interaction, 'verified');
+  if (customId === 'config_logs_channel') return await showChannelModal(interaction, 'logs');
+  
+  if (customId === 'config_verification_toggle') return await toggleConfigSetting(interaction, 'verification_enabled');
+  if (customId === 'config_security_antiraid') return await toggleConfigSetting(interaction, 'antiraid_enabled');
+  if (customId === 'config_security_vpn') return await toggleConfigSetting(interaction, 'vpn_check');
+  
+  if (customId === 'config_back') return await showConfigMenu(interaction, true);
+  
+  await interaction.reply({ content: '⚙️ This setting is coming soon or handled elsewhere.', ephemeral: true });
+}
+
+module.exports = {
+  command,
+  execute,
+  showConfigMenu,
+  handleCategorySelection,
+  showCooldownModal,
+  showLimitModal,
+  showRoleModal,
+  showChannelModal,
+  toggleConfigSetting,
+  handleModalSubmit,
+  handleConfigButton
+};
