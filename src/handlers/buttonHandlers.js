@@ -44,6 +44,10 @@ async function handleButton(interaction) {
     } else if (customId.startsWith('config_')) {
       const configHandler = require('../commands/config');
       await configHandler.handleConfigButton(interaction);
+    } else if (customId === 'prime_stock_upload') {
+      await handlePrimeStockUpload(interaction);
+    } else if (customId === 'prime_stock_refresh') {
+      await handlePrimeStockRefresh(interaction);
     } else {
       logger.warn('ButtonHandlers', `Unknown button: ${customId}`);
     }
@@ -70,9 +74,13 @@ async function handleGenButton(interaction) {
   const tier = parts[1];
   const serviceId = parts.slice(2).join('_');
 
-  if (tier === 'premium' && !interaction.member.roles.cache.has('1532346926425444474')) {
+  // Check Prime role if tier is prime
+  if (tier === 'prime') {
+    // For Prime, you can add a role check here if needed
+    // For now, let it pass through (or add Prime role ID)
+  } else if (tier === 'premium' && !interaction.member.roles.cache.has('1532346926425444474')) {
     return interaction.editReply({
-      content: "🖕 Va te faire foutre, t'as pas le rôle Premium ! Achète-le sur le shop avant de cliquer ici."
+      content: '🖕 Va te faire foutre, t\'as pas le rôle Premium ! Achète-le sur le shop avant de cliquer ici.'
     });
   }
 
@@ -119,9 +127,9 @@ async function handleGenButton(interaction) {
         account.account_info ? `ℹ️ **Info:** ${account.account_info}` : '',
         '',
         `${EMOJIS.INFO} **Tips:**`,
-        `• Change the password as soon as possible`,
-        `• Do not share this account`,
-        `• Leave your feedback in #proof!`,
+        '• Change the password as soon as possible',
+        '• Do not share this account',
+        '• Leave your feedback in #proof!',
         '',
         `**Stock remaining:** ${stock - 1}`
       ].filter(Boolean).join('\n'),
@@ -268,7 +276,7 @@ async function handleManualAccept(interaction) {
       await member.roles.remove(notRegisteredRole).catch(() => {});
     }
 
-    await member.send(`✅ You have been manually verified by staff. Welcome!`).catch(() => {});
+    await member.send('✅ You have been manually verified by staff. Welcome!').catch(() => {});
     
     const { sendDiscordLog } = require('../utils/discordLogger');
     await sendDiscordLog(
@@ -292,7 +300,7 @@ async function handleManualReject(interaction) {
   await interaction.update({ embeds: [embed], components: [] });
 
   if (member) {
-    await member.send(`❌ Your manual verification request was rejected.`).catch(() => {});
+    await member.send('❌ Your manual verification request was rejected.').catch(() => {});
   }
 }
 
@@ -333,9 +341,9 @@ async function handleTicketButton(interaction) {
       .setTitle(`🎫 Ticket - ${interaction.user.username}`)
       .setDescription(
         `**Welcome to your ticket, ${interaction.user}!**\n\n` +
-        `> 💡 **Please describe your request in detail.**\n` +
-        `> ⏳ A staff member will be with you shortly.\n\n` +
-        `*Click the button below when you are ready to close this ticket.*`
+        '> 💡 **Please describe your request in detail.**\n' +
+        '> ⏳ A staff member will be with you shortly.\n\n' +
+        '*Click the button below when you are ready to close this ticket.*'
       )
       .setColor(COLORS.INFO)
       .setThumbnail(interaction.user.displayAvatarURL())
@@ -504,14 +512,16 @@ async function handleShopApprove(interaction) {
     try {
       const user = await interaction.client.users.fetch(order.user_id);
       const embed = new EmbedBuilder()
-      .setTitle('✅ PAYMENT APPROVED')
-      .setDescription(`Congratulations <@${order.user_id}>! 🎉\n\nYour payment for **${order.product}** has been successfully verified.\nYour order will now be processed by our automated system!`)
-      .setColor(COLORS.SUCCESS)
-      .setImage(require('../config/constants').PANEL_BANNER_URL || null)
-      .setFooter({ text: `Order ID: ${dbId} • LS・Shop & Gen` })
-      .setTimestamp();
+        .setTitle('✅ PAYMENT APPROVED')
+        .setDescription(`Congratulations <@${order.user_id}>! 🎉\n\nYour payment for **${order.product}** has been successfully verified.\nYour order will now be processed by our automated system!`)
+        .setColor(COLORS.SUCCESS)
+        .setImage(require('../config/constants').PANEL_BANNER_URL || null)
+        .setFooter({ text: `Order ID: ${dbId} • LS・Shop & Gen` })
+        .setTimestamp();
       await user.send({ embeds: [embed] });
-    } catch (e) {} // Ignore if DMs are closed
+    } catch (e) {
+      // Ignore if DMs are closed
+    }
     
     await interaction.editReply({ content: `✅ Order #${order.payment_proof} approved successfully!` });
   } catch (error) {
@@ -550,17 +560,78 @@ async function handleShopReject(interaction) {
     try {
       const user = await interaction.client.users.fetch(order.user_id);
       const embed = new EmbedBuilder()
-      .setTitle('❌ PAYMENT REJECTED')
-      .setDescription(`Hello <@${order.user_id}>,\n\nUnfortunately, your payment for **${order.product}** could not be verified or was invalid.\nIf you believe this is an error, please open a regular support ticket.`)
-      .setColor(COLORS.ERROR)
-      .setFooter({ text: `Order ID: ${dbId} • LS・Shop & Gen` })
-      .setTimestamp();
+        .setTitle('❌ PAYMENT REJECTED')
+        .setDescription(`Hello <@${order.user_id}>,\n\nUnfortunately, your payment for **${order.product}** could not be verified or was invalid.\nIf you believe this is an error, please open a regular support ticket.`)
+        .setColor(COLORS.ERROR)
+        .setFooter({ text: `Order ID: ${dbId} • LS・Shop & Gen` })
+        .setTimestamp();
       await user.send({ embeds: [embed] });
-    } catch (e) {} // Ignore if DMs are closed
+    } catch (e) {
+      // Ignore if DMs are closed
+    }
     
     await interaction.editReply({ content: `❌ Order #${order.payment_proof} rejected successfully!` });
   } catch (error) {
     await interaction.editReply({ content: `❌ Error: ${error.message}` });
+  }
+}
+
+/**
+ * Handle Prime Stock Upload - Modal for uploading prime accounts
+ */
+async function handlePrimeStockUpload(interaction) {
+  const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require('discord.js');
+  
+  // Check if user has admin permissions
+  if (!interaction.member.permissions.has('Administrator')) {
+    return interaction.reply({
+      content: '❌ You need Administrator permission to upload Prime stock!',
+      flags: 64
+    });
+  }
+
+  const modal = new ModalBuilder()
+    .setCustomId('prime_stock_upload_modal')
+    .setTitle('📤 Upload Prime Stock');
+
+  const serviceSelect = new TextInputBuilder()
+    .setCustomId('prime_service')
+    .setLabel('Service (fortnite_prime or valorant_prime)')
+    .setStyle(TextInputStyle.Short)
+    .setPlaceholder('Enter: fortnite_prime or valorant_prime')
+    .setRequired(true)
+    .setMaxLength(30);
+
+  const accountsInput = new TextInputBuilder()
+    .setCustomId('prime_accounts')
+    .setLabel('Accounts (email:pass, one per line)')
+    .setStyle(TextInputStyle.Paragraph)
+    .setPlaceholder('email1:pass1\nemail2:pass2\nemail3:pass3')
+    .setRequired(true)
+    .setMaxLength(4000);
+
+  modal.addComponents(
+    new ActionRowBuilder().addComponents(serviceSelect),
+    new ActionRowBuilder().addComponents(accountsInput)
+  );
+
+  await interaction.showModal(modal);
+}
+
+/**
+ * Handle Prime Stock Refresh - Update the panel
+ */
+async function handlePrimeStockRefresh(interaction) {
+  await interaction.deferUpdate();
+  
+  try {
+    const { buildPrimeStockPanel } = require('../commands/deploy');
+    const panel = await buildPrimeStockPanel(interaction.guild);
+    
+    await interaction.editReply({ embeds: [panel.embed], components: panel.components });
+  } catch (error) {
+    console.error('Prime stock refresh error:', error);
+    await interaction.followUp({ content: '❌ Failed to refresh panel', flags: 64 });
   }
 }
 

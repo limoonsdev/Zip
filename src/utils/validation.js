@@ -149,10 +149,10 @@ function validateULPLine(line) {
  */
 function sanitizeInput(input) {
   if (!input || typeof input !== 'string') return '';
-  
+
   return input
     .trim()
-    .replace(/[<>\"'%;()&+]/g, '') // Remove dangerous chars
+    .replace(/[<>"'%;()&+]/g, '') // Remove dangerous chars
     .slice(0, 1000); // Limit length
 }
 

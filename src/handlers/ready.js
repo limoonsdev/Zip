@@ -87,7 +87,7 @@ async function handleReady(client) {
     console.log(`  👥 Users: ${stats.users}`);
     console.log(`  📋 Commands: ${stats.commands}`);
     console.log(`  💾 Database: ${dbInfo.type.toUpperCase()}`);
-    console.log(`  🎨 Features: Custom Emojis • Auto-Update • Ultra Design`);
+    console.log('  🎨 Features: Custom Emojis • Auto-Update • Ultra Design');
     console.log('');
     console.log('  ✅ All systems operational!');
     console.log('');

@@ -89,7 +89,7 @@ function registerModalHandlers(client) {
             const { COLORS, PANEL_BANNER_URL } = require('../config/constants');
             
             const embed = new EmbedBuilder()
-              .setTitle(`📢 LS・Shop & Gen - Announcement`)
+              .setTitle('📢 LS・Shop & Gen - Announcement')
               .setDescription(
                 `🇬🇧 **${titleEn}**\n${descEn}\n\n` +
                 `🇫🇷 **${titleFr}**\n${descFr}`
@@ -160,14 +160,14 @@ function registerModalHandlers(client) {
           const embed = new EmbedBuilder()
             .setTitle('🛒 Checkout - LS・Shop & Gen')
             .setDescription(`You are ordering **${quantity}x Boosts** for **${duration} Month(s)**.\n\n` +
-              `**Total to pay:**\n` +
+              '**Total to pay:**\n' +
               `💶 **${totalPrice} EUR** (PayPal / Rewarble)\n` +
               `💎 **${robuxPrice} Robux** (Roblox Gamepass)\n\n` +
-              `### Payment Methods:\n` +
+              '### Payment Methods:\n' +
               `1️⃣ **PayPal:** Send \`${totalPrice} EUR\` via 'Friends & Family' to: \`${paypalEmail}\`\n` +
               `2️⃣ **Rewarble:** Prepare a Rewarble Giftcard worth \`${totalPrice} EUR\`\n` +
               `3️⃣ **Robux:** Buy this Gamepass for \`${robuxPrice} Robux\`: [Click Here](${robuxUrl})\n\n` +
-              `*After paying, click the button below to submit your proof (Transaction ID, Code, or Username).*`
+              '*After paying, click the button below to submit your proof (Transaction ID, Code, or Username).*'
             )
             .setColor(COLORS.INFO)
             .setFooter({ text: `Order ID: ${orderId}` });
@@ -209,7 +209,7 @@ function registerModalHandlers(client) {
           
           // Disable the button on original message
           if (interaction.message) {
-             await interaction.message.edit({ components: [] }).catch(() => {});
+            await interaction.message.edit({ components: [] }).catch(() => {});
           }
           
           // Update order status to manual verification
@@ -220,7 +220,7 @@ function registerModalHandlers(client) {
           
           const embed = new EmbedBuilder()
             .setTitle('✅ Proof Submitted')
-            .setDescription(`Your payment proof has been transmitted to the staff.\nPlease wait patiently while we verify it.`)
+            .setDescription('Your payment proof has been transmitted to the staff.\nPlease wait patiently while we verify it.')
             .setColor(COLORS.SUCCESS);
             
           await interaction.editReply({ embeds: [embed] });
@@ -229,15 +229,15 @@ function registerModalHandlers(client) {
           const staffEmbed = new EmbedBuilder()
             .setTitle('🚨 ORDER VERIFICATION REQUIRED')
             .setDescription(
-              `A customer has submitted a payment proof for their order.\n\n` +
+              'A customer has submitted a payment proof for their order.\n\n' +
               `👤 **Customer:** <@${order.user_id}>\n` +
               `🆔 **Order ID:** \`${orderId}\`\n` +
               `📦 **Product:** \`${order.product}\`\n` +
               `💰 **Amount Due:** \`${order.price}€\`\n\n` +
-              `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+              '━━━━━━━━━━━━━━━━━━━━━━\n\n' +
               `💳 **Payment Method:** \`${method}\`\n` +
               `🧾 **Proof / Code:** \n\`\`\`\n${proof}\n\`\`\`\n\n` +
-              `⚠️ *Please verify this payment carefully before clicking Approve.*`
+              '⚠️ *Please verify this payment carefully before clicking Approve.*'
             )
             .setColor(COLORS.WARNING)
             .setFooter({ text: 'LS・Staff System' })
@@ -266,6 +266,90 @@ function registerModalHandlers(client) {
       }
 
       logger.debug('ModalHandler', `Unhandled modal: ${customId}`);
+
+      // Prime Stock Upload Modal
+      if (customId === 'prime_stock_upload_modal') {
+        await interaction.deferReply({ flags: 64 });
+
+        const serviceId = interaction.fields.getTextInputValue('prime_service').toLowerCase().trim();
+        const accountsInput = interaction.fields.getTextInputValue('prime_accounts');
+
+        // Validate service
+        const { getServiceById } = require('../config/services');
+        const service = getServiceById(serviceId);
+
+        if (!service || service.tier !== 'prime') {
+          return await interaction.editReply({
+            content: '❌ Invalid Prime service! Use: fortnite_prime or valorant_prime'
+          });
+        }
+
+        // Parse accounts
+        const accounts = accountsInput.split('\n').map(a => a.trim()).filter(Boolean);
+
+        if (accounts.length === 0) {
+          return await interaction.editReply({
+            content: '❌ No valid accounts provided!'
+          });
+        }
+
+        const { query } = require('../database/hybridPool');
+        const { EMOJIS, COLORS, PANEL_BANNER_URL } = require('../config/constants');
+        const { getOrFetchEmoji } = require('../services/emojiManager');
+
+        let added = 0;
+        let failed = 0;
+
+        for (const combo of accounts) {
+          if (!combo.includes(':')) {
+            failed++;
+            continue;
+          }
+
+          try {
+            const [email] = combo.split(':');
+            await query(
+              'INSERT INTO combos (service_id, combo, email, quality_score) VALUES ($1, $2, $3, $4) ON CONFLICT (combo) DO NOTHING',
+              [serviceId, combo, email, 100] // Prime gets quality score 100
+            );
+            added++;
+          } catch (error) {
+            failed++;
+          }
+        }
+
+        // Get new stock count
+        const stockResult = await query(
+          'SELECT COUNT(*) as count FROM combos WHERE service_id = $1',
+          [serviceId]
+        );
+        const totalStock = stockResult.rows[0]?.count || 0;
+
+        // Get service emoji
+        const serviceEmoji = await getOrFetchEmoji(interaction.guild, service);
+
+        const embed = {
+          title: '✅ Prime Stock Uploaded',
+          description: `**Service**\n${serviceEmoji} ${service.label}\n\n**Summary**\n✅ Added: \`${added}\`\n❌ Failed: \`${failed}\`\n\n📦 New Total: \`${totalStock}\``,
+          color: COLORS.SUCCESS,
+          image: { url: PANEL_BANNER_URL },
+          footer: {
+            text: 'LS・Shop & Gen - Prime Stock Manager',
+            iconURL: 'https://i.goopics.net/24ejy6.gif'
+          },
+          timestamp: new Date().toISOString()
+        };
+
+        await interaction.editReply({ embeds: [embed] });
+
+        logger.info('PrimeStock', `Prime stock uploaded for ${serviceId}`, {
+          service: serviceId,
+          added,
+          failed,
+          totalStock,
+          user: interaction.user.tag
+        });
+      }
     } catch (error) {
       logger.error('ModalHandler', 'Error handling modal', { 
         customId, 
@@ -277,7 +361,9 @@ function registerModalHandlers(client) {
           content: '❌ An error occurred while processing your request.',
           ephemeral: true
         });
-      } catch (e) {}
+      } catch (e) {
+        // Ignore reply errors
+      }
     }
   });
 

@@ -25,6 +25,8 @@ const command = new SlashCommandBuilder()
       .addChoices(
         { name: '✨ Gen Free Panel', value: 'gen_free' },
         { name: '👑 Gen Premium Panel', value: 'gen_premium' },
+        { name: '💎 Prime Panel', value: 'gen_prime' },
+        { name: '📦 Prime Stock Panel', value: 'prime_stock' },
         { name: '✅ Verification Panel', value: 'verification' },
         { name: '🎫 Ticket Panel', value: 'ticket' },
         { name: '📊 Status Panel', value: 'status' },
@@ -53,31 +55,47 @@ async function execute(interaction) {
     let panelsToDeploy = [];
 
     switch (type) {
-      case 'gen_free':
-        panelsToDeploy = await buildGenPanels('free', interaction.guild);
-        break;
-      case 'gen_premium':
-        panelsToDeploy = await buildGenPanels('premium', interaction.guild);
-        break;
-      case 'verification':
-        panelsToDeploy.push(buildVerificationPanel());
-        break;
-      case 'ticket':
-        panelsToDeploy.push(buildTicketPanel());
-        break;
-      case 'status':
-        const { buildStatusEmbed } = require('../services/panelManager');
-        panelsToDeploy.push({ embed: await buildStatusEmbed(interaction.guild), components: [] });
-        break;
-      case 'stock':
-        panelsToDeploy.push(await buildStockPanel(interaction.guild));
-        break;
-      case 'faq':
-        panelsToDeploy.push(buildFAQPanel());
-        break;
-      case 'shop':
-        panelsToDeploy.push(await buildShopPanel());
-        break;
+    case 'gen_free': {
+      panelsToDeploy = await buildGenPanels('free', interaction.guild);
+      break;
+    }
+    case 'gen_premium': {
+      panelsToDeploy = await buildGenPanels('premium', interaction.guild);
+      break;
+    }
+    case 'gen_prime': {
+      panelsToDeploy = await buildGenPanels('prime', interaction.guild);
+      break;
+    }
+    case 'prime_stock': {
+      panelsToDeploy.push(await buildPrimeStockPanel(interaction.guild));
+      break;
+    }
+    case 'verification': {
+      panelsToDeploy.push(buildVerificationPanel());
+      break;
+    }
+    case 'ticket': {
+      panelsToDeploy.push(buildTicketPanel());
+      break;
+    }
+    case 'status': {
+      const { buildStatusEmbed } = require('../services/panelManager');
+      panelsToDeploy.push({ embed: await buildStatusEmbed(interaction.guild), components: [] });
+      break;
+    }
+    case 'stock': {
+      panelsToDeploy.push(await buildStockPanel(interaction.guild));
+      break;
+    }
+    case 'faq': {
+      panelsToDeploy.push(buildFAQPanel());
+      break;
+    }
+    case 'shop': {
+      panelsToDeploy.push(await buildShopPanel());
+      break;
+    }
     }
 
     const messageIds = [];
@@ -87,7 +105,7 @@ async function execute(interaction) {
     }
 
     // Register panels for auto-update
-    if (['status', 'stock', 'gen_free', 'gen_premium'].includes(type) && messageIds.length > 0) {
+    if (['status', 'stock', 'gen_free', 'gen_premium', 'gen_prime', 'prime_stock'].includes(type) && messageIds.length > 0) {
       const { registerPanel } = require('../services/panelManager');
       const { getOrCreateGuildPanels, updateGuildPanels } = require('../database/models');
       // Pass the array of message IDs, identifying the group by the first ID
@@ -117,7 +135,7 @@ async function execute(interaction) {
 
     await interaction.editReply({
       content: `${EMOJIS.SUCCESS} **${type}** panel successfully deployed in ${channel}!\n` +
-        (['status', 'stock', 'gen_free', 'gen_premium'].includes(type) ? `${EMOJIS.INFO} Auto-update activated (every 5 seconds)` : '')
+        (['status', 'stock', 'gen_free', 'gen_premium', 'gen_prime', 'prime_stock'].includes(type) ? `${EMOJIS.INFO} Auto-update activated (every 5 seconds)` : '')
     });
 
   } catch (error) {
@@ -180,27 +198,27 @@ async function buildGenPanels(tier, guild) {
       .setTitle(isPremium ? `👑 LS・SHOP & GEN PREMIUM${titleSuffix}` : `✨ LS・SHOP & GEN FREE${titleSuffix}`)
       .setDescription(
         i === 0 ? (
-        isPremium
-          ? `### 💎 Premium Access\n\n` +
-            `> ⚡ **No queue** nor ads\n` +
-            `> 🏆 Guaranteed **high quality** accounts\n` +
-            `> 📩 **Instant** delivery in DMs\n` +
-            `> 👑 24/7 Priority Support\n\n` +
-            `### 📦 Included Services\n` +
+          isPremium
+            ? '### 💎 Premium Access\n\n' +
+            '> ⚡ **No queue** nor ads\n' +
+            '> 🏆 Guaranteed **high quality** accounts\n' +
+            '> 📩 **Instant** delivery in DMs\n' +
+            '> 👑 24/7 Priority Support\n\n' +
+            '### 📦 Included Services\n' +
             `${serviceList}\n\n` +
-            `**👇 Click a button below to generate!**`
-          : `### 🎁 Free Access\n\n` +
-            `> 🔄 Stock updated **in real time**\n` +
-            `> 🌍 Access to a wide catalog of services\n` +
-            `> 💬 Remember to leave a **#proof**\n` +
-            `> 💖 Status: \`.gg/lsgg\`\n\n` +
-            `### 📦 Available Services\n` +
+            '**👇 Click a button below to generate!**'
+            : '### 🎁 Free Access\n\n' +
+            '> 🔄 Stock updated **in real time**\n' +
+            '> 🌍 Access to a wide catalog of services\n' +
+            '> 💬 Remember to leave a **#proof**\n' +
+            '> 💖 Status: `.gg/lsgg`\n\n' +
+            '### 📦 Available Services\n' +
             `${serviceList}\n\n` +
-            `**👇 Click a button below to generate!**`
+            '**👇 Click a button below to generate!**'
         ) : (
-          `### 📦 More services...\n\n` +
+          '### 📦 More services...\n\n' +
           `${serviceList}\n\n` +
-          `**👇 Click a button below to generate!**`
+          '**👇 Click a button below to generate!**'
         )
       )
       .setColor(COLORS.FREE)
@@ -262,15 +280,15 @@ function buildVerificationPanel() {
   const OAUTH2_URL = 'https://discord.com/oauth2/authorize?client_id=1532345225945551018&response_type=code&redirect_uri=https%3A%2F%2Flimoon-space.cloud%2Fcallback&scope=identify+gdm.join';
 
   const embed = new EmbedBuilder()
-    .setTitle(`✅ LS・Shop & Gen Verification`)
+    .setTitle('✅ LS・Shop & Gen Verification')
     .setDescription(
-      `**Welcome to LS・Shop & Gen!**\n\n` +
-      `To access all channels and features:\n\n` +
-      `✅ Click the button below\n` +
-      `🎁 Automatic Verified role assignment\n` +
-      `⚡ Instant access to all channels\n` +
-      `👑 Unlock all features\n\n` +
-      `Ready? Click now!`
+      '**Welcome to LS・Shop & Gen!**\n\n' +
+      'To access all channels and features:\n\n' +
+      '✅ Click the button below\n' +
+      '🎁 Automatic Verified role assignment\n' +
+      '⚡ Instant access to all channels\n' +
+      '👑 Unlock all features\n\n' +
+      'Ready? Click now!'
     )
     .setColor(COLORS.SUCCESS)
     .setImage(PANEL_BANNER_URL)
@@ -287,7 +305,7 @@ function buildVerificationPanel() {
 
   const manualVerifyBtn = new ButtonBuilder()
     .setCustomId('verify_manual')
-    .setLabel("❓ Doesn't work? Click here!")
+    .setLabel('❓ Doesn\'t work? Click here!')
     .setStyle(ButtonStyle.Secondary);
 
   const row = new ActionRowBuilder().addComponents(button, manualVerifyBtn);
@@ -300,15 +318,15 @@ function buildVerificationPanel() {
  */
 function buildTicketPanel() {
   const embed = new EmbedBuilder()
-    .setTitle(`🎫 Support LS・Shop & Gen`)
+    .setTitle('🎫 Support LS・Shop & Gen')
     .setDescription(
-      `**Need assistance or information?**\n\n` +
-      `> 💳 **Purchases & Orders** (Payment issue, delivery)\n` +
-      `> ♻️ **Replacements** (Defective account, warranty)\n` +
-      `> 🤝 **Partnerships** (Collab, YouTube, TikTok)\n` +
-      `> ❓ **General Questions** (How to generate, VIP)\n\n` +
-      `*Our team usually replies in under 5 minutes.*\n` +
-      `**👇 Click the button below to open a ticket!**`
+      '**Need assistance or information?**\n\n' +
+      '> 💳 **Purchases & Orders** (Payment issue, delivery)\n' +
+      '> ♻️ **Replacements** (Defective account, warranty)\n' +
+      '> 🤝 **Partnerships** (Collab, YouTube, TikTok)\n' +
+      '> ❓ **General Questions** (How to generate, VIP)\n\n' +
+      '*Our team usually replies in under 5 minutes.*\n' +
+      '**👇 Click the button below to open a ticket!**'
     )
     .setColor(COLORS.INFO)
     .setImage(PANEL_BANNER_URL)
@@ -351,7 +369,9 @@ async function buildStockPanel(guild) {
       stockData[row.service_id] = count;
       totalStock += count;
     }
-  } catch (err) {}
+  } catch (err) {
+    // Ignore DB errors
+  }
   
   let description = `**Total Accounts Available:** \`${totalStock}\`\n\n`;
 
@@ -367,11 +387,11 @@ async function buildStockPanel(guild) {
       
       description += `> ${emojiStr} **${service.label}:** \`${count}\`\n`;
     }
-    description += `\n`;
+    description += '\n';
   }
   
   const embed = new EmbedBuilder()
-    .setTitle(`📦 LS・Shop & Gen - Live Stock`)
+    .setTitle('📦 LS・Shop & Gen - Live Stock')
     .setDescription(description)
     .setColor(COLORS.SUCCESS)
     .setImage(PANEL_BANNER_URL)
@@ -391,18 +411,18 @@ function buildFAQPanel() {
   const embed = new EmbedBuilder()
     .setTitle('❓ LS・Shop & Gen - Frequently Asked Questions (FAQ)')
     .setDescription(
-      `**Welcome to the FAQ! Here are answers to the most common questions:**\n\n` +
-      `> ⚡ **How do I generate an account?**\n` +
-      `> Go to the free or premium generator channel and click the button for the service you want.\n\n` +
-      `> ⏱️ **Is there a cooldown?**\n` +
-      `> Yes! Free users have a longer cooldown between generations. Premium users have a much shorter or zero cooldown. (Check \`/help\` for your status!)\n\n` +
-      `> 👑 **How do I get Premium?**\n` +
-      `> You can buy Premium to unlock exclusive services, bypass cooldowns, and get instant priority delivery. Open a ticket to purchase!\n\n` +
-      `> ❌ **My generated account doesn't work!**\n` +
-      `> Free accounts are community-provided and can sometimes die fast. For guaranteed high-quality accounts, use the **Premium** generator. If you purchased something and it doesn't work, open a **Ticket**.\n\n` +
-      `> 💬 **Why should I leave a #proof?**\n` +
-      `> Leaving proofs helps us maintain trust and sometimes earns you rewards! Plus, it's nice to say thanks.\n\n` +
-      `*Still have questions? Feel free to open a ticket!*`
+      '**Welcome to the FAQ! Here are answers to the most common questions:**\n\n' +
+      '> ⚡ **How do I generate an account?**\n' +
+      '> Go to the free or premium generator channel and click the button for the service you want.\n\n' +
+      '> ⏱️ **Is there a cooldown?**\n' +
+      '> Yes! Free users have a longer cooldown between generations. Premium users have a much shorter or zero cooldown. (Check `/help` for your status!)\n\n' +
+      '> 👑 **How do I get Premium?**\n' +
+      '> You can buy Premium to unlock exclusive services, bypass cooldowns, and get instant priority delivery. Open a ticket to purchase!\n\n' +
+      '> ❌ **My generated account doesn\'t work!**\n' +
+      '> Free accounts are community-provided and can sometimes die fast. For guaranteed high-quality accounts, use the **Premium** generator. If you purchased something and it doesn\'t work, open a **Ticket**.\n\n' +
+      '> 💬 **Why should I leave a #proof?**\n' +
+      '> Leaving proofs helps us maintain trust and sometimes earns you rewards! Plus, it\'s nice to say thanks.\n\n' +
+      '*Still have questions? Feel free to open a ticket!*'
     )
     .setColor(COLORS.INFO)
     .setImage(PANEL_BANNER_URL)
@@ -421,16 +441,16 @@ function buildFAQPanel() {
 async function buildShopPanel() {
   const { StringSelectMenuBuilder } = require('discord.js');
   const embed = new EmbedBuilder()
-    .setTitle(`🛒 LS・Shop & Gen - Auto Shop`)
+    .setTitle('🛒 LS・Shop & Gen - Auto Shop')
     .setDescription(
-      `**Welcome to our Automated Shop!** 🚀\n\n` +
-      `Here you can purchase Discord Server Boosts instantly.\n` +
-      `Our system supports **PayPal**, **Rewarble**, and **Robux**.\n\n` +
-      `**How it works:**\n` +
-      `1️⃣ Select your desired package from the menu below.\n` +
-      `2️⃣ Follow the payment instructions (PayPal, Giftcard, or Gamepass).\n` +
-      `3️⃣ Click **Submit Payment Proof** to verify your order.\n\n` +
-      `> ⚡ Secure, Fast, and Reliable!`
+      '**Welcome to our Automated Shop!** 🚀\n\n' +
+      'Here you can purchase Discord Server Boosts instantly.\n' +
+      'Our system supports **PayPal**, **Rewarble**, and **Robux**.\n\n' +
+      '**How it works:**\n' +
+      '1️⃣ Select your desired package from the menu below.\n' +
+      '2️⃣ Follow the payment instructions (PayPal, Giftcard, or Gamepass).\n' +
+      '3️⃣ Click **Submit Payment Proof** to verify your order.\n\n' +
+      '> ⚡ Secure, Fast, and Reliable!'
     )
     .setColor(COLORS.INFO)
     .setImage(PANEL_BANNER_URL)
@@ -470,4 +490,177 @@ async function buildShopPanel() {
   return { embeds: [embed], components: [selectRow, buttonRow] };
 }
 
-module.exports = { command, execute, buildGenPanels, buildStockPanel, buildFAQPanel, buildShopPanel };
+/**
+ * Build Prime Panel - Only Fortnite High Quality & Valorant Medium Quality
+ */
+async function buildPrimePanel(guild) {
+  const services = getServicesByTier('prime');
+
+  // Fetch stock data for button labels
+  const { query } = require('../database/hybridPool');
+  const stockData = {};
+  try {
+    const result = await query('SELECT service_id, COUNT(*) as count FROM combos GROUP BY service_id');
+    for (const row of result.rows) {
+      stockData[row.service_id] = parseInt(row.count, 10) || 0;
+    }
+  } catch (error) {
+    // Silently continue if stock fetch fails
+  }
+
+  const panels = [];
+
+  // Split services into chunks of 25 (Discord max components per message)
+  for (let i = 0; i < services.length; i += 25) {
+    const chunk = services.slice(i, i + 25);
+
+    // Build service list with emojis for the description
+    let serviceList = '> ';
+    let count = 0;
+    for (const service of chunk.slice(0, 12)) {
+      const emoji = await getOrFetchEmoji(guild, service);
+      const emojiStr = typeof emoji === 'string' ? emoji : (emoji?.toString() || service.defaultEmoji);
+      serviceList += `${emojiStr} **${service.label}**  `;
+      count++;
+      if (count % 3 === 0 && count < 12) serviceList += '\n> ';
+    }
+    if (chunk.length > 12) serviceList += `\n> *... and ${chunk.length - 12} other services below*`;
+
+    const titleSuffix = i > 0 ? ` (Part ${Math.floor(i/25) + 1})` : '';
+
+    // Ultra-styled embed WITHOUT ASCII
+    const embed = new EmbedBuilder()
+      .setTitle(`💎 LS・SHOP & GEN PRIME${titleSuffix}`)
+      .setDescription(
+        i === 0 ? (
+          '### 👑 Prime Access\n\n' +
+          '> ⚡ **No queue** nor ads\n' +
+          '> 🏆 Guaranteed **High/Medium quality** accounts\n' +
+          '> 📩 **Instant** delivery in DMs\n' +
+          '> 💎 24/7 Priority Support\n\n' +
+          '### 📦 Prime Services\n' +
+          `${serviceList}\n\n` +
+          '**👇 Click a button below to generate!**'
+        ) : (
+          '### 📦 More Prime services...\n\n' +
+          `${serviceList}\n\n` +
+          '**👇 Click a button below to generate!**'
+        )
+      )
+      .setColor('#FFD700') // Gold color for Prime
+      .setFooter({ 
+        text: '💎 LS・Shop & Gen Prime • Ultra Exclusive' + titleSuffix,
+        iconURL: 'https://i.goopics.net/24ejy6.gif'
+      })
+      .setTimestamp();
+
+    // Only add banner to the first message to prevent chat clutter
+    if (i === 0) {
+      embed.setImage(PANEL_BANNER_URL);
+    }
+
+    // Create buttons with CUSTOM emojis
+    const components = [];
+    let currentRow = new ActionRowBuilder();
+    let buttonCount = 0;
+
+    for (const service of chunk) {
+      // Get or create custom emoji
+      const emoji = await getOrFetchEmoji(guild, service);
+
+      const stockCount = stockData[service.id] || 0;
+
+      const button = new ButtonBuilder()
+        .setCustomId(`gen_prime_${service.id}`)
+        .setLabel(`${service.label.substring(0, 60)} [${stockCount}]`)
+        .setStyle(stockCount > 0 ? ButtonStyle.Success : ButtonStyle.Danger)
+        .setDisabled(stockCount === 0);
+
+      // Set emoji (custom object or default string)
+      if (typeof emoji === 'string') {
+        button.setEmoji(emoji);
+      } else if (emoji && emoji.id) {
+        button.setEmoji(emoji.id);
+      }
+
+      currentRow.addComponents(button);
+      buttonCount++;
+
+      // Start new row after 5 buttons
+      if (buttonCount % 5 === 0 || buttonCount === chunk.length) {
+        components.push(currentRow);
+        currentRow = new ActionRowBuilder();
+      }
+    }
+
+    panels.push({ embed, components });
+  }
+
+  return panels;
+}
+
+/**
+ * Build Prime Stock Panel - Shows stock for Prime services with upload capability
+ */
+async function buildPrimeStockPanel(guild) {
+  const { query } = require('../database/hybridPool');
+
+  let totalStock = 0;
+
+  const primeServices = getServicesByTier('prime');
+  const stockData = {};
+
+  try {
+    const result = await query('SELECT service_id, COUNT(*) as count FROM combos GROUP BY service_id');
+    for (const row of result.rows) {
+      const count = parseInt(row.count, 10) || 0;
+      stockData[row.service_id] = count;
+      totalStock += count;
+    }
+  } catch (err) {
+    // Ignore DB errors
+  }
+
+  let description = `**💎 Prime Total Accounts Available:** \`${totalStock}\`\n\n`;
+
+  for (const service of primeServices) {
+    const count = stockData[service.id] || 0;
+    const emoji = await getOrFetchEmoji(guild, service);
+    const emojiStr = typeof emoji === 'string' ? emoji : `<:${emoji.name}:${emoji.id}>`;
+
+    const qualityLabel = service.id === 'fortnite_prime' ? '🔥 High Quality' : '⭐ Medium Quality';
+    description += `> ${emojiStr} **${service.label}** (${qualityLabel}): \`${count}\`\n`;
+  }
+
+  description += '\n> 💎 *Prime accounts are premium quality with better stats and longevity*';
+
+  const embed = new EmbedBuilder()
+    .setTitle('💎 LS・Shop & Gen - Prime Stock Panel')
+    .setDescription(description)
+    .setColor('#FFD700')
+    .setImage(PANEL_BANNER_URL)
+    .setFooter({ 
+      text: '💎 LS・Shop & Gen Prime Stock • Auto Updates Every 5s',
+      iconURL: 'https://i.goopics.net/24ejy6.gif'
+    })
+    .setTimestamp();
+
+  // Add upload button for admins
+  const uploadButton = new ButtonBuilder()
+    .setCustomId('prime_stock_upload')
+    .setLabel('📤 Upload Prime Stock')
+    .setStyle(ButtonStyle.Success)
+    .setEmoji('📤');
+
+  const refreshButton = new ButtonBuilder()
+    .setCustomId('prime_stock_refresh')
+    .setLabel('🔄 Refresh')
+    .setStyle(ButtonStyle.Secondary)
+    .setEmoji('🔄');
+
+  const row = new ActionRowBuilder().addComponents(uploadButton, refreshButton);
+
+  return { embed, components: [row] };
+}
+
+module.exports = { command, execute, buildGenPanels, buildPrimePanel, buildPrimeStockPanel, buildStockPanel, buildFAQPanel, buildShopPanel };

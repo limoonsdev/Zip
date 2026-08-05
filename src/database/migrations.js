@@ -243,7 +243,7 @@ async function createIndexes() {
     try {
       await query(indexSql);
     } catch (error) {
-      logger.warn('Database', `Index creation skipped (may already exist)`, { 
+      logger.warn('Database', 'Index creation skipped (may already exist)', { 
         error: error.message 
       });
     }
@@ -273,16 +273,22 @@ async function createOrdersTable() {
   `);
 
   try {
-    await query(`ALTER TABLE orders ADD COLUMN payment_method VARCHAR(50)`);
-  } catch (e) {}
-  
-  try {
-    await query(`ALTER TABLE orders ADD COLUMN payment_proof VARCHAR(255)`);
-  } catch (e) {}
+    await query('ALTER TABLE orders ADD COLUMN payment_method VARCHAR(50)');
+  } catch (e) {
+    // Column may already exist
+  }
 
   try {
-    await query(`ALTER TABLE orders ADD COLUMN paypal_order_id VARCHAR(100)`);
-  } catch (e) {}
+    await query('ALTER TABLE orders ADD COLUMN payment_proof VARCHAR(255)');
+  } catch (e) {
+    // Column may already exist
+  }
+
+  try {
+    await query('ALTER TABLE orders ADD COLUMN paypal_order_id VARCHAR(100)');
+  } catch (e) {
+    // Column may already exist
+  }
 }
 
 module.exports = {

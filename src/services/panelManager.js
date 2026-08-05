@@ -49,13 +49,13 @@ async function buildStatusEmbed(guild) {
   const EMOJI_UP = '<a:servicesup:1532399539187617792>';
   const EMOJI_DOWN = '<a:servicesdown:1532399527418400988>';
 
-  let description = `**💻 Systems Status**\n`;
+  let description = '**💻 Systems Status**\n';
   description += `${EMOJI_UP} 🤖 **Discord Bot** • \`Online\`\n`;
   description += `${EMOJI_UP} ⚙️ **Backend API** • \`Online\`\n`;
   description += `${EMOJI_UP} 💾 **Database** • \`Online\`\n\n`;
 
   const embed = new EmbedBuilder()
-    .setTitle(`📊 LS・Shop & Gen • Systems Status`)
+    .setTitle('📊 LS・Shop & Gen • Systems Status')
     .setDescription(description)
     .addFields(
       {
@@ -112,6 +112,13 @@ function registerPanel(messageIdInput, channelId, guildId, type, client) {
       } else if (type === 'gen_premium') {
         const { buildGenPanels } = require('../commands/deploy');
         newPanels = await buildGenPanels('premium', guild);
+      } else if (type === 'gen_prime') {
+        const { buildGenPanels } = require('../commands/deploy');
+        newPanels = await buildGenPanels('prime', guild);
+      } else if (type === 'prime_stock') {
+        const { buildPrimeStockPanel } = require('../commands/deploy');
+        const stockPanel = await buildPrimeStockPanel(guild);
+        newPanels = [{ embed: stockPanel.embed, components: stockPanel.components }];
       }
 
       // Update each message
@@ -154,7 +161,7 @@ function unregisterPanel(messageId) {
   if (panel) {
     clearInterval(panel.interval);
     activePanels.delete(messageId);
-    logger.info('PanelManager', `Unregistered panel`, { messageId });
+    logger.info('PanelManager', 'Unregistered panel', { messageId });
   }
 }
 

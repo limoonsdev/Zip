@@ -43,7 +43,7 @@ async function execute(interaction) {
     if (totalUsers === 0) {
       return interaction.editReply({
         content: `${EMOJIS.INFO} No verified users at the moment.\n\n` +
-          `**Verification link:**\n` +
+          '**Verification link:**\n' +
           `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&scope=identify+gdm.join`
       });
     }
@@ -85,7 +85,7 @@ async function execute(interaction) {
     }
 
     const embed = new EmbedBuilder()
-      .setTitle(`👥 Verified Users`)
+      .setTitle('👥 Verified Users')
       .setDescription(
         `**Total: ${totalUsers} users**\n` +
         `Page ${page}/${totalPages}\n\n` +
@@ -109,7 +109,7 @@ async function execute(interaction) {
 
     await interaction.editReply({ embeds: [embed] });
 
-    logger.info('Verified', `Listed verified users`, {
+    logger.info('Verified', 'Listed verified users', {
       page,
       totalUsers,
       refreshed: refreshedCount

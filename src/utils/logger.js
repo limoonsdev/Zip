@@ -60,11 +60,11 @@ class Logger {
    */
   getColorForLevel(level) {
     switch (level) {
-      case 'ERROR': return COLORS.RED;
-      case 'WARN': return COLORS.YELLOW;
-      case 'INFO': return COLORS.BLUE;
-      case 'DEBUG': return COLORS.CYAN;
-      default: return COLORS.RESET;
+    case 'ERROR': return COLORS.RED;
+    case 'WARN': return COLORS.YELLOW;
+    case 'INFO': return COLORS.BLUE;
+    case 'DEBUG': return COLORS.CYAN;
+    default: return COLORS.RESET;
     }
   }
 

@@ -24,14 +24,14 @@ async function execute(interaction) {
   const gagnants = interaction.options.getInteger('gagnants') || 1;
   
   const embed = new EmbedBuilder()
-    .setTitle(`🎉 GIVEAWAY LS・SHOP & GEN`)
+    .setTitle('🎉 GIVEAWAY LS・SHOP & GEN')
     .setDescription(
-      `**Participate for a chance to win:**\n\n` +
+      '**Participate for a chance to win:**\n\n' +
       `> 🎁 **Prize:** ${lot}\n` +
       `> ⏱️ **Duration:** ${duree}\n` +
       `> 🏆 **Winner(s):** ${gagnants}\n\n` +
-      `**To participate:**\n` +
-      `React with 🎉 under this message!`
+      '**To participate:**\n' +
+      'React with 🎉 under this message!'
     )
     .setColor(COLORS.PREMIUM)
     .setImage(PANEL_BANNER_URL)

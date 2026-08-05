@@ -21,10 +21,10 @@ async function execute(interaction) {
   const embed = new EmbedBuilder()
     .setTitle(`🎁 NEW DROP : ${service.toUpperCase()}`)
     .setDescription(
-      `**A new free account has just appeared!**\n\n` +
+      '**A new free account has just appeared!**\n\n' +
       `> 🎮 **Service:** ${service}\n` +
       `> 🔑 **Account:** ||${combo}||\n\n` +
-      `*First come, first served! Don't forget to leave a #proof if you got it.*`
+      '*First come, first served! Don\'t forget to leave a #proof if you got it.*'
     )
     .setColor(COLORS.BOOST)
     .setImage(PANEL_BANNER_URL)

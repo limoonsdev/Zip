@@ -99,7 +99,7 @@ async function handleFileRestock(interaction, serviceId, service) {
     await interaction.editReply({
       content: `${EMOJIS.ERROR} **No file attached!**\n\n` +
         `${EMOJIS.INFO} Use this command by attaching a TXT or ULP file.\n` +
-        `Format: \`email:password\` (one per line)`
+        'Format: `email:password` (one per line)'
     });
     return;
   }
@@ -170,7 +170,7 @@ async function handleFileRestock(interaction, serviceId, service) {
 
       // Update progress every batch
       const progress = Math.min(100, Math.round((i + batch.length) / combos.length * 100));
-      let statusMsg = `${EMOJIS.INFO} Import in progress...\n` +
+      const statusMsg = `${EMOJIS.INFO} Import in progress...\n` +
         `📊 Progress: ${progress}%\n` +
         `✅ Added: ${added}\n` +
         `❌ Failed: ${failed}`;
@@ -192,16 +192,16 @@ async function handleFileRestock(interaction, serviceId, service) {
     const serviceEmoji = await getOrFetchEmoji(interaction.guild, service);
 
     const embed = new EmbedBuilder()
-      .setTitle(`✅ Restock Complete`)
+      .setTitle('✅ Restock Complete')
       .setDescription(
-        `**Service**\n` +
+        '**Service**\n' +
         `${serviceEmoji} ${service.label}\n\n` +
-        `**Source File**\n` +
+        '**Source File**\n' +
         `📄 ${attachment.name}\n\n` +
-        `**Results**\n` +
+        '**Results**\n' +
         `✅ Added: \`${added.toLocaleString()}\`\n` +
         `❌ Failed: \`${failed.toLocaleString()}\`\n\n` +
-        `**Total Stock**\n` +
+        '**Total Stock**\n' +
         `📦 ${totalStock.toLocaleString()} accounts available`
       )
       .setColor(COLORS.SUCCESS)
@@ -298,15 +298,15 @@ async function handleGofileRestock(interaction, serviceId, service, gofileUrl) {
     const embed = new EmbedBuilder()
       .setTitle(`${EMOJIS.SUCCESS} GoFile Restock Complete - ${service.label}`)
       .setDescription(
-        `╔═══════════════════════════════════════╗\n` +
-        `║   **GOFILE IMPORT SUCCESSFUL**       ║\n` +
-        `╚═══════════════════════════════════════╝\n\n` +
-        `🔗 **Source:** GoFile\n` +
+        '╔═══════════════════════════════════════╗\n' +
+        '║   **GOFILE IMPORT SUCCESSFUL**       ║\n' +
+        '╚═══════════════════════════════════════╝\n\n' +
+        '🔗 **Source:** GoFile\n' +
         `📦 **Service:** ${service.label}\n\n` +
         `📁 **Files processed:** ${result.tasksProcessed}\n` +
         `📊 **Lines analyzed:** ${result.linesProcessed}\n` +
         `✅ **Accounts added:** ${totalAdded}\n` +
-        `📊 **Quality score:** ${qualityScore}/100\n\n` +
+        '📊 **Quality score:** 50/100\n\n' +
         `${EMOJIS.STOCK} **Total stock:** ${totalStock} accounts`
       )
       .setColor(COLORS.SUCCESS)

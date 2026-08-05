@@ -39,7 +39,7 @@ app.get('/callback', async (req, res) => {
   }
 
   try {
-    logger.info('OAuth', `Processing verification`, { code: code.substring(0, 10) + '***' });
+    logger.info('OAuth', 'Processing verification', { code: code.substring(0, 10) + '***' });
 
     // Exchange code for access token
     const tokenResponse = await axios.post('https://discord.com/api/v10/oauth2/token', 
@@ -72,7 +72,7 @@ app.get('/callback', async (req, res) => {
     const discriminator = user.discriminator;
     const avatar = user.avatar;
 
-    logger.info('OAuth', `User verified`, {
+    logger.info('OAuth', 'User verified', {
       userId,
       username: `${username}#${discriminator}`
     });
@@ -104,7 +104,7 @@ app.get('/callback', async (req, res) => {
       scope
     ]);
 
-    logger.info('OAuth', `Verification saved to database`, { userId });
+    logger.info('OAuth', 'Verification saved to database', { userId });
 
     // Try to assign role (if bot is in same guild)
     try {
@@ -122,7 +122,7 @@ app.get('/callback', async (req, res) => {
                 await member.roles.remove(notRegisteredRole).catch(() => {});
               }
               
-              logger.info('OAuth', `Role assigned`, {
+              logger.info('OAuth', 'Role assigned', {
                 userId,
                 guildId: guild.id,
                 roleId: VERIFIED_ROLE_ID
@@ -134,14 +134,14 @@ app.get('/callback', async (req, res) => {
         }
       }
     } catch (error) {
-      logger.warn('OAuth', `Failed to assign role`, { error: error.message });
+      logger.warn('OAuth', 'Failed to assign role', { error: error.message });
     }
 
     // Send success page
     res.send(buildSuccessPage(username, discriminator, avatar));
 
   } catch (error) {
-    logger.error('OAuth', `Verification failed`, {
+    logger.error('OAuth', 'Verification failed', {
       error: error.message,
       response: error.response?.data
     });

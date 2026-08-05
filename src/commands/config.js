@@ -154,24 +154,24 @@ async function handleCategorySelection(interaction) {
   const category = interaction.values[0];
 
   switch (category) {
-    case 'cooldowns':
-      await showCooldownsConfig(interaction);
-      break;
-    case 'limits':
-      await showLimitsConfig(interaction);
-      break;
-    case 'roles':
-      await showRolesConfig(interaction);
-      break;
-    case 'verification':
-      await showVerificationConfig(interaction);
-      break;
-    case 'security':
-      await showSecurityConfig(interaction);
-      break;
-    case 'logs':
-      await showLogsConfig(interaction);
-      break;
+  case 'cooldowns':
+    await showCooldownsConfig(interaction);
+    break;
+  case 'limits':
+    await showLimitsConfig(interaction);
+    break;
+  case 'roles':
+    await showRolesConfig(interaction);
+    break;
+  case 'verification':
+    await showVerificationConfig(interaction);
+    break;
+  case 'security':
+    await showSecurityConfig(interaction);
+    break;
+  case 'logs':
+    await showLogsConfig(interaction);
+    break;
   }
 }
 
@@ -534,7 +534,7 @@ async function handleModalSubmit(interaction) {
 
     if (!ms) {
       return await interaction.reply({
-        content: `❌ Invalid time format. Use: 30s, 1m, 1h, etc.`,
+        content: '❌ Invalid time format. Use: 30s, 1m, 1h, etc.',
         ephemeral: true
       });
     }
@@ -556,7 +556,7 @@ async function handleModalSubmit(interaction) {
 
     if (isNaN(value) || value < -1) {
       return await interaction.reply({
-        content: `❌ Invalid number. Use a positive number or 0 for unlimited.`,
+        content: '❌ Invalid number. Use a positive number or 0 for unlimited.',
         ephemeral: true
       });
     }
@@ -576,21 +576,21 @@ async function handleModalSubmit(interaction) {
   } else if (type === 'role') {
     const value = interaction.fields.getTextInputValue('role_id_value');
     if (!/^\d{17,20}$/.test(value)) {
-      return await interaction.reply({ content: `❌ Invalid Role ID.`, ephemeral: true });
+      return await interaction.reply({ content: '❌ Invalid Role ID.', ephemeral: true });
     }
     let key = `role_${tier}`;
     if (tier === 'verified') key = 'verified_role';
     
     await updateGuildConfig(interaction.guild.id, { [key]: value });
-    await interaction.reply({ content: `✅ Role set successfully!`, ephemeral: true });
+    await interaction.reply({ content: '✅ Role set successfully!', ephemeral: true });
   } else if (type === 'channel') {
     const value = interaction.fields.getTextInputValue('channel_id_value');
     if (!/^\d{17,20}$/.test(value)) {
-      return await interaction.reply({ content: `❌ Invalid Channel ID.`, ephemeral: true });
+      return await interaction.reply({ content: '❌ Invalid Channel ID.', ephemeral: true });
     }
-    let key = `log_channel`; // since logs is the only one for now
+    const key = 'log_channel'; // since logs is the only one for now
     await updateGuildConfig(interaction.guild.id, { [key]: value });
-    await interaction.reply({ content: `✅ Channel set successfully!`, ephemeral: true });
+    await interaction.reply({ content: '✅ Channel set successfully!', ephemeral: true });
   }
 }
 

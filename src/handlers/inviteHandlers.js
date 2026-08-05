@@ -111,7 +111,7 @@ function registerInviteHandlers(client) {
     try {
       newInvites = await guild.invites.fetch();
     } catch (err) {
-      logger.error('InviteTracker', `Failed to fetch invites on member add`, { error: err.message });
+      logger.error('InviteTracker', 'Failed to fetch invites on member add', { error: err.message });
       return;
     }
     
@@ -141,12 +141,12 @@ function registerInviteHandlers(client) {
           await addInviteStat(inviterId, 'regular');
         }
       } catch (err) {
-        logger.error('InviteTracker', `DB insert failed`, { error: err.message });
+        logger.error('InviteTracker', 'DB insert failed', { error: err.message });
       }
     }
     
     // Target specific welcome channel
-    let welcomeChannel = guild.channels.cache.get(WELCOME_CHANNEL_ID);
+    const welcomeChannel = guild.channels.cache.get(WELCOME_CHANNEL_ID);
     
     if (welcomeChannel) {
       let description = `Welcome to **${guild.name}**, ${member}!\n\n`;
@@ -156,10 +156,10 @@ function registerInviteHandlers(client) {
         description += `> 📨 **Invited by:** ${inviterUser} (\`${inviterId}\`)\n`;
         description += `> 📊 **Invites:** \`${stats.total}\` (**${stats.regular}** ✅ | **${stats.fake}** 💩 | **${stats.leaves}** ❌)\n`;
         if (isFake) {
-          description += `> ⚠️ **Warning:** This account is less than 7 days old (Fake).`;
+          description += '> ⚠️ **Warning:** This account is less than 7 days old (Fake).';
         }
       } else {
-        description += `> 📨 **Invited by:** Unknown / Vanity URL\n`;
+        description += '> 📨 **Invited by:** Unknown / Vanity URL\n';
       }
       
       description += `\n*Account created: <t:${Math.floor(member.user.createdAt.getTime() / 1000)}:R>*`;
@@ -210,7 +210,7 @@ function registerInviteHandlers(client) {
         }
       }
     } catch (err) {
-      logger.error('InviteTracker', `Failed to process user leave`, { error: err.message });
+      logger.error('InviteTracker', 'Failed to process user leave', { error: err.message });
     }
   });
 }

@@ -38,7 +38,7 @@ async function execute(interaction) {
     .setCustomId('announce_desc_fr')
     .setLabel('Description (French)')
     .setStyle(TextInputStyle.Paragraph)
-    .setPlaceholder("Texte de l'annonce en français...")
+    .setPlaceholder('Texte de l\'annonce en français...')
     .setRequired(true)
     .setMaxLength(1500);
 

@@ -29,6 +29,10 @@ const SERVICES = [
   // Gaming Services
   { id: 'fortnite', label: 'Fortnite', emojiName: 'ng_fortnite', defaultEmoji: '🎮', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Fortnite_F_lettermark_logo.png', style: ButtonStyle.Secondary, tier: 'free' },
   { id: 'valorant', label: 'Valorant', emojiName: 'ng_valorant', defaultEmoji: '🎯', iconUrl: 'https://img.icons8.com/color/512/valorant.png', style: ButtonStyle.Secondary, tier: 'free' },
+  
+  // Prime Gaming Services (High/Medium Quality)
+  { id: 'fortnite_prime', label: 'Fortnite High Quality', emojiName: 'ng_fortnite', defaultEmoji: '👑🎮', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Fortnite_F_lettermark_logo.png', style: ButtonStyle.Success, tier: 'prime' },
+  { id: 'valorant_prime', label: 'Valorant Medium Quality', emojiName: 'ng_valorant', defaultEmoji: '👑🎯', iconUrl: 'https://img.icons8.com/color/512/valorant.png', style: ButtonStyle.Success, tier: 'prime' },
   { id: 'steam', label: 'Steam', emojiName: 'ng_steam', defaultEmoji: '🎮', iconUrl: 'https://img.icons8.com/color/512/steam.png', style: ButtonStyle.Secondary, tier: 'free' },
   { id: 'epicgames', label: 'Epic Games', emojiName: 'ng_epicgames', defaultEmoji: '🎮', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Epic_Games_logo.svg/512px-Epic_Games_logo.svg.png', style: ButtonStyle.Secondary, tier: 'premium' },
   { id: 'battlenet', label: 'Battle.net', emojiName: 'ng_battlenet', defaultEmoji: '⚔️', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Battle.net_Logo.svg/512px-Battle.net_Logo.svg.png', style: ButtonStyle.Secondary, tier: 'premium' },

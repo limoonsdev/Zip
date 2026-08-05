@@ -88,11 +88,11 @@ async function execute(interaction) {
     const serviceEmoji = await getOrFetchEmoji(interaction.guild, service);
 
     const embed = new EmbedBuilder()
-      .setTitle(`✅ Stock Added`)
+      .setTitle('✅ Stock Added')
       .setDescription(
-        `**Service**\n` +
+        '**Service**\n' +
         `${serviceEmoji} ${service.label}\n\n` +
-        `**Summary**\n` +
+        '**Summary**\n' +
         `✅ Added: \`${added}\`\n` +
         `❌ Failed: \`${failed}\`\n\n` +
         `📦 New Total: \`${totalStock}\``
