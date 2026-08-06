@@ -59,8 +59,8 @@ async function showConfigMenu(interaction, isUpdate = false) {
       {
         name: '⏱️ Cooldowns',
         value: 
-          `Free: ${formatTime(config.cooldown_free || 30000)}\n` +
-          `Premium: ${formatTime(config.cooldown_premium || 10000)}`,
+          `Free: ${formatTime(config.cooldown_free || 600000)}\n` +
+          `Premium: ${formatTime(config.cooldown_premium || 60000)}`,
         inline: true
       },
       {

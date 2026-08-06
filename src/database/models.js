@@ -191,8 +191,8 @@ async function getOrCreateGuildConfig(guildId) {
 
   if (result.rows.length === 0) {
     const defaultConfig = {
-      cooldown_free: 30000,
-      cooldown_premium: 10000,
+      cooldown_free: 600000,
+      cooldown_premium: 60000,
       daily_limit_free: 10,
       daily_limit_premium: 50,
       role_free: null,

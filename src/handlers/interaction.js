@@ -282,7 +282,11 @@ async function handleRoleSelectMenu(interaction) {
  */
 async function handleModalSubmit(interaction) {
   const staticModals = ['suggestion_modal', 'announce_modal'];
-  if (staticModals.includes(interaction.customId) || interaction.customId.startsWith('config_modal_')) {
+  if (interaction.customId.startsWith('config_modal_')) {
+    const config = require('../commands/config');
+    return await config.handleModalSubmit(interaction);
+  }
+  if (staticModals.includes(interaction.customId)) {
     return;
   }
 
