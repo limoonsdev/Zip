@@ -88,7 +88,7 @@ async function execute(interaction) {
       break;
     }
     case 'shop': {
-      panelsToDeploy.push(await buildShopPanel());
+      panelsToDeploy.push(await buildShopPanel(interaction.guild));
       break;
     }
     }
@@ -436,7 +436,10 @@ function buildFAQPanel() {
 /**
  * Build Shop Panel
  */
-async function buildShopPanel() {
+async function buildShopPanel(guild) {
+  const boostEmoji = guild ? guild.emojis.cache.find(e => e.name === 'boosts' || e.name === 'boost') : null;
+  const boostEmojiConfig = boostEmoji ? { id: boostEmoji.id } : { name: '🚀' };
+
   const { StringSelectMenuBuilder } = require('discord.js');
   const embed = new EmbedBuilder()
     .setTitle('🛒 PrimeGen - Auto Shop')
@@ -464,19 +467,19 @@ async function buildShopPanel() {
           label: '14 Boosts (1 Month)',
           description: 'Price: 3.60 EUR',
           value: 'pkg_14b_1m',
-          emoji: { id: '1532768005388369940' } // Using nitroBoost emoji for boosts too as a placeholder if wanted, or no emoji
+          emoji: boostEmojiConfig
         },
         {
           label: '28 Boosts (1 Month)',
           description: 'Price: 5.60 EUR',
           value: 'pkg_28b_1m',
-          emoji: { id: '1532768005388369940' }
+          emoji: boostEmojiConfig
         },
         {
           label: '14 Boosts (3 Months)',
           description: 'Price: 9.00 EUR',
           value: 'pkg_14b_3m',
-          emoji: { id: '1532768005388369940' }
+          emoji: boostEmojiConfig
         },
         {
           label: '1000 Robux',
