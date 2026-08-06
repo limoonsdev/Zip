@@ -595,6 +595,68 @@ async function handleModalSubmit(interaction) {
 }
 
 /**
+ * Pull members who left the server using OAuth2
+ */
+async function pullLeftMembers(interaction) {
+  await interaction.reply({ content: '🔄 Démarrage du rapatriement des membres (Pull Members)... Cela peut prendre quelques minutes en fonction du nombre.', flags: 64 });
+  
+  try {
+    const { query } = require('../database/hybridPool');
+    const axios = require('axios');
+    const { getLogger } = require('../utils/logger');
+    const logger = getLogger();
+
+    const result = await query('SELECT user_id, access_token, username FROM verified_users');
+    const users = result.rows;
+
+    let pulledCount = 0;
+    let failedCount = 0;
+    let alreadyInServerCount = 0;
+
+    for (const user of users) {
+      try {
+        const member = await interaction.guild.members.fetch(user.user_id).catch(() => null);
+        if (member) {
+          alreadyInServerCount++;
+          continue;
+        }
+
+        const response = await axios.put(
+          `https://discord.com/api/v10/guilds/${interaction.guild.id}/members/${user.user_id}`,
+          { access_token: user.access_token },
+          {
+            headers: {
+              Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        if (response.status === 201 || response.status === 204) {
+          pulledCount++;
+        } else {
+          failedCount++;
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 500)); // Respect Discord rate limits
+      } catch (err) {
+        failedCount++;
+      }
+    }
+
+    await interaction.followUp({
+      content: `✅ **Rapatriement terminé !**\n\n📊 **Résultats :**\n- 🔄 Membres ramenés : **${pulledCount}**\n- 🏠 Déjà sur le serveur : **${alreadyInServerCount}**\n- ❌ Échecs (Tokens expirés/invalides) : **${failedCount}**\n- 👥 Total dans la base de données : **${users.length}**`,
+      flags: 64
+    });
+
+    logger.info('Config', `Oauth Pull finished: ${pulledCount} pulled, ${failedCount} failed.`, { guild: interaction.guild.id });
+
+  } catch (error) {
+    await interaction.followUp({ content: `❌ Erreur lors du rapatriement : ${error.message}`, flags: 64 });
+  }
+}
+
+/**
  * Handle config buttons
  */
 async function handleConfigButton(interaction) {
@@ -610,6 +672,7 @@ async function handleConfigButton(interaction) {
   if (customId === 'config_logs_channel') return await showChannelModal(interaction, 'logs');
   
   if (customId === 'config_verification_toggle') return await toggleConfigSetting(interaction, 'verification_enabled');
+  if (customId === 'config_verification_cleanup') return await pullLeftMembers(interaction);
   if (customId === 'config_security_antiraid') return await toggleConfigSetting(interaction, 'antiraid_enabled');
   if (customId === 'config_security_vpn') return await toggleConfigSetting(interaction, 'vpn_check');
   
@@ -629,5 +692,6 @@ module.exports = {
   showChannelModal,
   toggleConfigSetting,
   handleModalSubmit,
-  handleConfigButton
+  handleConfigButton,
+  pullLeftMembers
 };
