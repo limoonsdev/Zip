@@ -40,6 +40,21 @@ function registerSelectHandlers(client) {
       let quantity = 0, duration = 0, totalPrice = 0, robuxPrice = 0, product = '', robuxUrl = '';
       
       switch (selection) {
+      case 'pkg_14b_1m':
+        quantity = 14; duration = 1; totalPrice = 3.60; robuxPrice = 515;
+        product = '14x Discord Server Boosts (1 Month)';
+        robuxUrl = 'https://www.roblox.com/fr/game-pass/1933119505/LS-Shop-14-Boost-Robux-1-Month';
+        break;
+      case 'pkg_28b_1m':
+        quantity = 28; duration = 1; totalPrice = 5.60; robuxPrice = 800;
+        product = '28x Discord Server Boosts (1 Month)';
+        robuxUrl = 'https://www.roblox.com/fr/game-pass/1933701407/LS-Shop-28-Boost-Robux-1-Month';
+        break;
+      case 'pkg_14b_3m':
+        quantity = 14; duration = 3; totalPrice = 9.00; robuxPrice = 1300;
+        product = '14x Discord Server Boosts (3 Months)';
+        robuxUrl = 'https://www.roblox.com/fr/game-pass/1933623398/LS-Shop-14-Boost-Robux-3-Month';
+        break;
       case 'pkg_robux_1000':
         quantity = 1000; duration = 0; totalPrice = 1.79; robuxPrice = 1429; // ~1429 after 30% tax if needed, but not required to display. We'll just set it.
         product = '1000 Robux';

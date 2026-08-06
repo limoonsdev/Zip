@@ -441,17 +441,14 @@ async function buildShopPanel() {
   const embed = new EmbedBuilder()
     .setTitle('🛒 PrimeGen - Auto Shop')
     .setDescription(
-      '# <:robux:1533223890548035746> PrimeGen Robux Prices :\n\n' +
-      '**1000 Robux : 1.79€**\n' +
-      '**1200 Robux : 2.15€**\n' +
-      '**1400 Robux : 2.51€**\n' +
-      '**1800 Robux : 3.22€**\n' +
-      '**2000 Robux : 3.58€**\n' +
-      '**4000 Robux : 7.16€**\n\n' +
-      '# 30% TAX NOT COVERED\n\n' +
-      '# <a:nitroBoost:1532768005388369940> PrimeGen Nitro Boost Prices :\n\n' +
-      '**Nitro 1 Month : 3.60€**\n' +
-      '**Method : Gift Link (No Credit Card Required)**'
+      '**Welcome to our Automated Shop!** 🚀\n\n' +
+      'Here you can purchase Discord Server Boosts, Discord Nitro, and Robux instantly.\n' +
+      'Our system supports **PayPal**, **Rewarble**, and **Robux**.\n\n' +
+      '**How it works:**\n' +
+      '1️⃣ Select your desired package from the menu below.\n' +
+      '2️⃣ Follow the payment instructions (PayPal, Giftcard, or Gamepass).\n' +
+      '3️⃣ Click **Submit Payment Proof** to verify your order.\n\n' +
+      '> ⚡ Secure, Fast, and Reliable!'
     )
     .setColor(COLORS.INFO)
     .setImage(PANEL_BANNER_URL)
@@ -463,6 +460,24 @@ async function buildShopPanel() {
       .setCustomId('shop_package_select')
       .setPlaceholder('🛒 Select an item to order...')
       .addOptions([
+        {
+          label: '14 Boosts (1 Month)',
+          description: 'Price: 3.60 EUR',
+          value: 'pkg_14b_1m',
+          emoji: { id: '1532768005388369940' } // Using nitroBoost emoji for boosts too as a placeholder if wanted, or no emoji
+        },
+        {
+          label: '28 Boosts (1 Month)',
+          description: 'Price: 5.60 EUR',
+          value: 'pkg_28b_1m',
+          emoji: { id: '1532768005388369940' }
+        },
+        {
+          label: '14 Boosts (3 Months)',
+          description: 'Price: 9.00 EUR',
+          value: 'pkg_14b_3m',
+          emoji: { id: '1532768005388369940' }
+        },
         {
           label: '1000 Robux',
           description: '1.79€ (Tax Not Covered)',
