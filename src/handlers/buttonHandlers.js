@@ -19,8 +19,10 @@ async function handleButton(interaction) {
   const customId = interaction.customId;
 
   try {
-    if (customId.startsWith('gen_free_') || customId.startsWith('gen_premium_')) {
+    if (customId.startsWith('gen_free_') || customId.startsWith('gen_premium_') || customId.startsWith('gen_prime_')) {
       await handleGenButton(interaction);
+    } else if (customId === 'lang_fr' || customId === 'lang_en') {
+      await handleLanguageSwitch(interaction);
     } else if (customId === 'verify_user') {
       await handleVerifyButton(interaction);
     } else if (customId === 'verify_manual') {
@@ -74,11 +76,8 @@ async function handleGenButton(interaction) {
   const tier = parts[1];
   const serviceId = parts.slice(2).join('_');
 
-  // Check Prime role if tier is prime
-  if (tier === 'prime') {
-    // For Prime, you can add a role check here if needed
-    // For now, let it pass through (or add Prime role ID)
-  } else if (tier === 'premium' && !interaction.member.roles.cache.has('1532346926425444474')) {
+  // Check Premium role if tier is premium
+  if (tier === 'premium' && !interaction.member.roles.cache.has('1532346926425444474')) {
     return interaction.editReply({
       content: '🖕 Va te faire foutre, t\'as pas le rôle Premium ! Achète-le sur le shop avant de cliquer ici.'
     });
@@ -115,33 +114,24 @@ async function handleGenButton(interaction) {
   await query('DELETE FROM combos WHERE id = $1', [account.id]);
 
   try {
-    const dmEmbed = {
-      title: `${EMOJIS.SUCCESS} ${service.label} - Account Generated`,
-      description: [
-        `**${service.label}**`,
-        '',
-        '```',
-        account.combo,
-        '```',
-        '',
-        account.account_info ? `ℹ️ **Info:** ${account.account_info}` : '',
-        '',
-        `${EMOJIS.INFO} **Tips:**`,
-        '• Change the password as soon as possible',
-        '• Do not share this account',
-        '• Leave your feedback in #proof!',
-        '',
-        `**Stock remaining:** ${stock - 1}`
-      ].filter(Boolean).join('\n'),
-      color: tier === 'premium' ? 0xFFD700 : 0x2B2D31,
-      footer: { text: 'PrimeGen Generator' },
-      timestamp: new Date().toISOString()
-    };
+    const remainingStock = Math.max(0, stock - 1);
+    const dmEmbed = buildFrenchGenEmbed(service.label, account.combo, account.account_info, remainingStock);
 
-    await interaction.user.send({ embeds: [dmEmbed] });
+    const languageRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId('lang_fr')
+        .setLabel('🇫🇷 Français')
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId('lang_en')
+        .setLabel('🇬🇧 English')
+        .setStyle(ButtonStyle.Secondary)
+    );
+
+    await interaction.user.send({ embeds: [dmEmbed], components: [languageRow] });
 
     await interaction.editReply({
-      content: `${EMOJIS.SUCCESS} **${service.label}** sent via DM!\n${EMOJIS.INFO} Check your direct messages.`
+      content: `${EMOJIS.SUCCESS} **${service.label}** envoyé en DM !\n${EMOJIS.INFO} Veuillez vérifier vos messages privés et choisir votre langue.`
     });
 
     logger.info('Gen', `Account generated for ${interaction.user.tag}`, {
@@ -151,26 +141,149 @@ async function handleGenButton(interaction) {
     });
     
     if (interaction.guild) {
-      const { sendDiscordLog } = require('../utils/discordLogger');
-      await sendDiscordLog(
+      // 1. Send detailed combo log to Discord log channel
+      const { sendGenLog } = require('../utils/discordLogger');
+      await sendGenLog(
         interaction.guild,
-        'Account Generated',
-        `**User:** ${interaction.user} (\`${interaction.user.id}\`)\n**Service:** ${service.label}\n**Tier:** ${tier === 'premium' ? '👑 Premium' : '🆓 Free'}`,
-        tier === 'premium' ? 0xFFD700 : 0x5865F2
+        interaction.user,
+        service,
+        account.combo,
+        tier
       );
+
+      // 2. Ping user in proof/avis channel and auto-delete ping after 10s
+      await pingUserInProofChannel(interaction.guild, interaction.user, service);
     }
 
   } catch (dmError) {
     logger.error('Gen', 'Could not send DM', { error: dmError.message });
     
+    // Restore combo to DB if DM failed
     await query(
       'INSERT INTO combos (service_id, combo, account_info) VALUES ($1, $2, $3)',
       [serviceId, account.combo, account.account_info]
     );
 
     await interaction.editReply({
-      content: `${EMOJIS.ERROR} Could not send you a DM!\n${EMOJIS.INFO} Check that your DMs are enabled.`
+      content: `${EMOJIS.ERROR} Impossible de vous envoyer un MP !\n${EMOJIS.INFO} Vérifiez que vos messages privés sont bien ouverts.`
     });
+  }
+}
+
+function buildFrenchGenEmbed(serviceLabel, combo, accountInfo, remainingStock) {
+  const { EmbedBuilder } = require('discord.js');
+  return new EmbedBuilder()
+    .setTitle(`🎁 PrimeGen • ${serviceLabel} (Compte Généré)`)
+    .setDescription(
+      `**Service :** \`${serviceLabel}\`\n\n` +
+      '**Compte :**\n' +
+      `\`\`\`\n${combo}\n\`\`\`\n` +
+      (accountInfo ? `ℹ️ **Information :** ${accountInfo}\n\n` : '') +
+      '💡 **Conseils importants :**\n' +
+      '• Changez le mot de passe immédiatement si possible.\n' +
+      '• Ne partagez pas ce compte avec d\'autres personnes.\n\n' +
+      '⚠️ **RAPPEL OBLIGATOIRE :**\n' +
+      'Vous devez **obligatoirement** laisser un avis / proof dans <#1532367074125545673> sous **24 heures** !\n' +
+      '👉 **Si vous ne le faites pas dans les 24h, vous recevrez un avertissement !**\n\n' +
+      `📦 **Stock restant :** \`${remainingStock}\``
+    )
+    .setColor(0x57F287)
+    .setImage('https://i.goopics.net/2eukvn.gif')
+    .setFooter({ text: 'PrimeGen Generator • Statut: .gg/primegen', iconURL: 'https://i.goopics.net/2eukvn.gif' })
+    .setTimestamp();
+}
+
+function buildEnglishGenEmbed(serviceLabel, combo, accountInfo, remainingStock) {
+  const { EmbedBuilder } = require('discord.js');
+  return new EmbedBuilder()
+    .setTitle(`🎁 PrimeGen • ${serviceLabel} (Generated Account)`)
+    .setDescription(
+      `**Service:** \`${serviceLabel}\`\n\n` +
+      '**Account:**\n' +
+      `\`\`\`\n${combo}\n\`\`\`\n` +
+      (accountInfo ? `ℹ️ **Information:** ${accountInfo}\n\n` : '') +
+      '💡 **Important Tips:**\n' +
+      '• Change the password immediately if possible.\n' +
+      '• Do not share this account with anyone.\n\n' +
+      '⚠️ **MANDATORY NOTICE:**\n' +
+      'You must leave a review / proof in <#1532367074125545673> within **24 hours**!\n' +
+      '👉 **If you fail to do so within 24h, you will receive a warning!**\n\n' +
+      `📦 **Stock remaining:** \`${remainingStock}\``
+    )
+    .setColor(0x5865F2)
+    .setImage('https://i.goopics.net/2eukvn.gif')
+    .setFooter({ text: 'PrimeGen Generator • Status: .gg/primegen', iconURL: 'https://i.goopics.net/2eukvn.gif' })
+    .setTimestamp();
+}
+
+async function handleLanguageSwitch(interaction) {
+  try {
+    const isFrench = interaction.customId === 'lang_fr';
+    const embed = interaction.message.embeds[0];
+    if (!embed) return interaction.deferUpdate();
+
+    const match = embed.description ? embed.description.match(/```\n?([\s\S]*?)\n?```/) : null;
+    const combo = match ? match[1].trim() : 'N/A';
+
+    const rawTitle = embed.title || '';
+    const serviceLabel = rawTitle
+      .replace(/^🎁\s*PrimeGen\s*•\s*/, '')
+      .replace(/\s*\((Compte Généré|Generated Account)\)$/, '') || 'Service';
+
+    const infoMatch = embed.description ? embed.description.match(/ℹ️ \*\*Information? :\*\* (.*?)\n/) : null;
+    const accountInfo = infoMatch ? infoMatch[1] : '';
+
+    const stockMatch = embed.description ? embed.description.match(/📦 \*\*Stock (restant|remaining) :\*\* `?(\d+)`?/) : null;
+    const remainingStock = stockMatch ? stockMatch[2] : '0';
+
+    const newEmbed = isFrench 
+      ? buildFrenchGenEmbed(serviceLabel, combo, accountInfo, remainingStock)
+      : buildEnglishGenEmbed(serviceLabel, combo, accountInfo, remainingStock);
+
+    const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+    const languageRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId('lang_fr')
+        .setLabel('🇫🇷 Français')
+        .setStyle(isFrench ? ButtonStyle.Primary : ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId('lang_en')
+        .setLabel('🇬🇧 English')
+        .setStyle(isFrench ? ButtonStyle.Secondary : ButtonStyle.Primary)
+    );
+
+    await interaction.update({ embeds: [newEmbed], components: [languageRow] });
+  } catch (err) {
+    logger.error('LanguageSwitch', 'Failed to switch language', { error: err.message });
+  }
+}
+
+async function pingUserInProofChannel(guild, user, service) {
+  if (!guild) return;
+
+  try {
+    const REVIEW_CHANNEL_ID = '1532367074125545673';
+    let proofChannel = await guild.channels.fetch(REVIEW_CHANNEL_ID).catch(() => null);
+
+    if (!proofChannel) {
+      proofChannel = guild.channels.cache.find(c => 
+        c.isTextBased() && ['proof', 'proofs', 'avis', 'feedback', 'reputation', 'avis-clients', 'proof-gen', 'proofs-gen'].includes(c.name.toLowerCase())
+      );
+    }
+
+    if (proofChannel) {
+      const pingMsg = await proofChannel.send(
+        `Hey ${user} ! 🎁 N'oublie pas de laisser ton avis / proof dans <#${REVIEW_CHANNEL_ID}> sous **24h** pour ta génération de **${service.label}** !\n⚠️ **Si tu ne le fais pas dans les 24h, tu recevras un avertissement.**`
+      ).catch(() => null);
+
+      if (pingMsg) {
+        setTimeout(() => {
+          pingMsg.delete().catch(() => {});
+        }, 10000);
+      }
+    }
+  } catch (err) {
+    logger.error('ProofPing', 'Failed to ping user in proof channel', { error: err.message });
   }
 }
 
