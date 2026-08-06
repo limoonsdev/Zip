@@ -261,7 +261,8 @@ async function buildBasicPanels(guild) {
  * Build ultra-styled verification panel - OAUTH2 LINK
  */
 function buildVerificationPanel() {
-  const OAUTH2_URL = 'https://discord.com/oauth2/authorize?client_id=1532345225945551018&response_type=code&redirect_uri=https%3A%2F%2Flimoon-space.cloud%2Fcallback&scope=identify+guilds.join';
+  const redirectUri = process.env.DISCORD_REDIRECT_URI || 'https://limoon-space.cloud/callback';
+  const OAUTH2_URL = redirectUri.replace(/\/callback\/?$/, '');
 
   const embed = new EmbedBuilder()
     .setTitle('✅ PrimeGen Verification')
