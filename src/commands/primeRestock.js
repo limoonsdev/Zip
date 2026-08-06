@@ -191,17 +191,17 @@ function downloadFile(url, dest) {
 
 async function parseComboFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');
-  const lines = content.split('\n');
+  const lines = content.split(/\r?\n/);
   const combos = [];
-  const comboRegex = /^([^:]+):([^:]+)$/;
 
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('//')) {
       continue;
     }
-    const match = trimmed.match(comboRegex);
-    if (match) {
+    
+    const colonIndex = trimmed.indexOf(':');
+    if (colonIndex > 0 && colonIndex < trimmed.length - 1) {
       combos.push(trimmed);
     }
   }
