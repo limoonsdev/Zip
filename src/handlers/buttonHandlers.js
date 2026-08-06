@@ -22,7 +22,9 @@ async function handleButton(interaction) {
   try {
     if (customId.startsWith('gen_free_') || customId.startsWith('gen_premium_') || customId.startsWith('gen_prime_')) {
       await handleGenButton(interaction);
-    }  else if (customId === 'verify_user') {
+    } else if (customId === 'lang_fr' || customId === 'lang_en') {
+      await handleLanguageSwitch(interaction);
+    } else if (customId === 'verify_user') {
       await handleVerifyButton(interaction);
     } else if (customId === 'verify_manual') {
       await handleVerifyManual(interaction);
@@ -115,7 +117,19 @@ async function handleGenButton(interaction) {
   try {
     const remainingStock = Math.max(0, stock - 1);
     const dmEmbed = buildEnglishGenEmbed(service.label, account.combo, account.account_info, remainingStock);
-    await interaction.user.send({ embeds: [dmEmbed] });
+    
+    const languageRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId('lang_fr')
+        .setLabel('🇫🇷 Français')
+        .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId('lang_en')
+        .setLabel('🇬🇧 English')
+        .setStyle(ButtonStyle.Primary)
+    );
+
+    await interaction.user.send({ embeds: [dmEmbed], components: [languageRow] });
 
     await interaction.editReply({
       content: `${EMOJIS.SUCCESS} **${service.label}** sent to your DMs!\n${EMOJIS.INFO} Please check your private messages.`
