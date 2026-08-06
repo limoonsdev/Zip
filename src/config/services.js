@@ -29,16 +29,23 @@ const SERVICES = [
   // Gaming Services
   { id: 'fortnite', label: 'Fortnite', emojiName: 'ng_fortnite', defaultEmoji: '🎮', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Fortnite_F_lettermark_logo.png', style: ButtonStyle.Secondary, tier: 'free' },
   { id: 'valorant', label: 'Valorant', emojiName: 'ng_valorant', defaultEmoji: '🎯', iconUrl: 'https://img.icons8.com/color/512/valorant.png', style: ButtonStyle.Secondary, tier: 'free' },
-  
-  // Prime Gaming Services
-  { id: 'fortnite_prime', label: 'Fortnite', emojiName: 'ng_fortnite', defaultEmoji: '👑🎮', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Fortnite_F_lettermark_logo.png', style: ButtonStyle.Success, tier: 'prime' },
-  { id: 'valorant_prime', label: 'Valorant', emojiName: 'ng_valorant', defaultEmoji: '👑🎯', iconUrl: 'https://img.icons8.com/color/512/valorant.png', style: ButtonStyle.Success, tier: 'prime' },
   { id: 'steam', label: 'Steam', emojiName: 'ng_steam', defaultEmoji: '🎮', iconUrl: 'https://img.icons8.com/color/512/steam.png', style: ButtonStyle.Secondary, tier: 'free' },
   { id: 'epicgames', label: 'Epic Games', emojiName: 'ng_epicgames', defaultEmoji: '🎮', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Epic_Games_logo.svg/512px-Epic_Games_logo.svg.png', style: ButtonStyle.Secondary, tier: 'premium' },
   { id: 'battlenet', label: 'Battle.net', emojiName: 'ng_battlenet', defaultEmoji: '⚔️', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Battle.net_Logo.svg/512px-Battle.net_Logo.svg.png', style: ButtonStyle.Secondary, tier: 'premium' },
   { id: 'xbox', label: 'Xbox', emojiName: 'ng_xbox', defaultEmoji: '🟢', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Xbox_one_logo.svg/500px-Xbox_one_logo.svg.png', style: ButtonStyle.Secondary, tier: 'premium' },
   { id: 'psn', label: 'PlayStation Network', emojiName: 'ng_psn', defaultEmoji: '🟦', iconUrl: 'https://cdn-icons-png.flaticon.com/512/5968/5968875.png', style: ButtonStyle.Secondary, tier: 'premium' },
   { id: 'roblox', label: 'Roblox', emojiName: 'ng_roblox', defaultEmoji: '🧱', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Roblox_player_icon_black.svg/512px-Roblox_player_icon_black.svg.png', style: ButtonStyle.Secondary, tier: 'free' },
+  { id: 'minecraft', label: 'Minecraft', emojiName: 'ng_minecraft', defaultEmoji: '⛏️', iconUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/51/Minecraft_cover.png/220px-Minecraft_cover.png', style: ButtonStyle.Secondary, tier: 'premium' },
+  { id: 'leagueoflegends', label: 'League of Legends', emojiName: 'ng_lol', defaultEmoji: '⚔️', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/League_of_Legends_2019_vector.svg/512px-League_of_Legends_2019_vector.svg.png', style: ButtonStyle.Secondary, tier: 'free' },
+  { id: 'ea', label: 'EA / Origin', emojiName: 'ng_ea', defaultEmoji: '🎮', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Electronic-Arts-Logo.svg/512px-Electronic-Arts-Logo.svg.png', style: ButtonStyle.Secondary, tier: 'free' },
+  { id: 'ubisoft', label: 'Ubisoft Connect', emojiName: 'ng_ubisoft', defaultEmoji: '🌀', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Ubisoft_logo.svg/512px-Ubisoft_logo.svg.png', style: ButtonStyle.Secondary, tier: 'free' },
+  { id: 'genshin', label: 'Genshin Impact', emojiName: 'ng_genshin', defaultEmoji: '🌟', iconUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/Genshin_Impact_logo.svg/512px-Genshin_Impact_logo.svg.png', style: ButtonStyle.Secondary, tier: 'premium' },
+  { id: 'rockstar', label: 'Rockstar Games', emojiName: 'ng_rockstar', defaultEmoji: '⭐', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Rockstar_Games_Logo.svg/512px-Rockstar_Games_Logo.svg.png', style: ButtonStyle.Secondary, tier: 'premium' },
+  { id: 'nintendo', label: 'Nintendo Switch', emojiName: 'ng_nintendo', defaultEmoji: '🎮', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Nintendo_Switch_Core_Logo_and_Text_mark.svg/512px-Nintendo_Switch_Core_Logo_and_Text_mark.svg.png', style: ButtonStyle.Secondary, tier: 'premium' },
+  
+  // Prime Gaming Services
+  { id: 'fortnite_prime', label: 'Fortnite (Prime)', emojiName: 'ng_fortnite', defaultEmoji: '👑🎮', iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Fortnite_F_lettermark_logo.png', style: ButtonStyle.Success, tier: 'prime' },
+  { id: 'valorant_prime', label: 'Valorant (Prime)', emojiName: 'ng_valorant', defaultEmoji: '👑🎯', iconUrl: 'https://img.icons8.com/color/512/valorant.png', style: ButtonStyle.Success, tier: 'prime' },
   
   // VPN Services
   { id: 'nordvpn', label: 'NordVPN', emojiName: 'ng_nordvpn', defaultEmoji: '🛡️', iconUrl: 'https://img.icons8.com/color/512/nordvpn.png', style: ButtonStyle.Secondary, tier: 'premium' },

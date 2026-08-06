@@ -69,8 +69,8 @@ app.get('/callback', async (req, res) => {
     const user = userResponse.data;
     const userId = user.id;
     const username = user.username;
-    const discriminator = user.discriminator;
-    const avatar = user.avatar;
+    const discriminator = user.discriminator || '0';
+    const avatar = user.avatar || null;
 
     logger.info('OAuth', 'User verified', {
       userId,
@@ -114,7 +114,11 @@ app.get('/callback', async (req, res) => {
           try {
             const member = await guild.members.fetch(userId);
             if (member && VERIFIED_ROLE_ID) {
-              await member.roles.add(VERIFIED_ROLE_ID);
+              await member.roles.add(VERIFIED_ROLE_ID).catch(() => {});
+              
+              // Add membres role
+              const membresRoleId = '1532391228040282232';
+              await member.roles.add(membresRoleId).catch(() => {});
               
               // Remove "not registered" role
               const notRegisteredRole = guild.roles.cache.find(r => r.name.toLowerCase() === 'not registered' || r.name.toLowerCase() === 'unverified');

@@ -80,7 +80,7 @@ async function buildStatusEmbed(guild) {
  */
 function registerPanel(messageIdInput, channelId, guildId, type, client) {
   // Only update supported panels
-  if (!['status', 'stock', 'gen_free', 'gen_premium'].includes(type)) {
+  if (!['status', 'stock', 'basic_panel'].includes(type)) {
     return;
   }
 
@@ -106,19 +106,9 @@ function registerPanel(messageIdInput, channelId, guildId, type, client) {
         const { buildStockPanel } = require('../commands/deploy');
         const stockPanel = await buildStockPanel(guild);
         newPanels = [{ embed: stockPanel.embed, components: stockPanel.components }];
-      } else if (type === 'gen_free') {
-        const { buildGenPanels } = require('../commands/deploy');
-        newPanels = await buildGenPanels('free', guild);
-      } else if (type === 'gen_premium') {
-        const { buildGenPanels } = require('../commands/deploy');
-        newPanels = await buildGenPanels('premium', guild);
-      } else if (type === 'gen_prime') {
-        const { buildGenPanels } = require('../commands/deploy');
-        newPanels = await buildGenPanels('prime', guild);
-      } else if (type === 'prime_stock') {
-        const { buildPrimeStockPanel } = require('../commands/deploy');
-        const stockPanel = await buildPrimeStockPanel(guild);
-        newPanels = [{ embed: stockPanel.embed, components: stockPanel.components }];
+      } else if (type === 'basic_panel') {
+        const { buildBasicPanels } = require('../commands/deploy');
+        newPanels = await buildBasicPanels(guild);
       }
 
       // Update each message

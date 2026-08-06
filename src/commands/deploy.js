@@ -23,8 +23,7 @@ const command = new SlashCommandBuilder()
       .setDescription('Type of panel to deploy')
       .setRequired(true)
       .addChoices(
-        { name: '✨ Gen Free Panel', value: 'gen_free' },
-        { name: '👑 Gen Premium Panel', value: 'gen_premium' },
+        { name: '💎 Basic Panel (Free & Premium)', value: 'basic_panel' },
         { name: '💎 Prime Panel', value: 'gen_prime' },
         { name: '📦 Prime Stock Panel', value: 'prime_stock' },
         { name: '✅ Verification Panel', value: 'verification' },
@@ -55,12 +54,8 @@ async function execute(interaction) {
     let panelsToDeploy = [];
 
     switch (type) {
-    case 'gen_free': {
-      panelsToDeploy = await buildGenPanels('free', interaction.guild);
-      break;
-    }
-    case 'gen_premium': {
-      panelsToDeploy = await buildGenPanels('premium', interaction.guild);
+    case 'basic_panel': {
+      panelsToDeploy = await buildBasicPanels(interaction.guild);
       break;
     }
     case 'gen_prime': {
@@ -104,8 +99,8 @@ async function execute(interaction) {
       messageIds.push(msg.id);
     }
 
-    // Register panels for auto-update
-    if (['status', 'stock', 'gen_free', 'gen_premium', 'gen_prime', 'prime_stock'].includes(type) && messageIds.length > 0) {
+    // Register panels for auto-update (Prime panel no longer auto-updates to reduce spam)
+    if (['status', 'stock', 'basic_panel'].includes(type) && messageIds.length > 0) {
       const { registerPanel } = require('../services/panelManager');
       const { getOrCreateGuildPanels, updateGuildPanels } = require('../database/models');
       // Pass the array of message IDs, identifying the group by the first ID
@@ -130,12 +125,12 @@ async function execute(interaction) {
       channel: channel.id,
       message: messageIds[0] || 'none',
       user: interaction.user.id,
-      autoUpdate: ['status', 'stock', 'gen_free', 'gen_premium'].includes(type)
+      autoUpdate: ['status', 'stock', 'basic_panel'].includes(type)
     });
 
     await interaction.editReply({
       content: `${EMOJIS.SUCCESS} **${type}** panel successfully deployed in ${channel}!\n` +
-        (['status', 'stock', 'gen_free', 'gen_premium', 'gen_prime', 'prime_stock'].includes(type) ? `${EMOJIS.INFO} Auto-update activated (every 5 seconds)` : '')
+        (['status', 'stock', 'basic_panel'].includes(type) ? `${EMOJIS.INFO} Auto-update activated (every 5 seconds)` : '')
     });
 
   } catch (error) {
@@ -152,13 +147,11 @@ async function execute(interaction) {
 }
 
 /**
- * Build ultra-styled generation panel with custom emojis - NO ASCII (Supports multiple messages)
+ * Build ultra-styled basic generation panel with custom emojis - NO ASCII (Supports multiple messages)
  */
-async function buildGenPanels(tier, guild) {
-  const isPremium = tier === 'premium';
-  
-  // Get services for this tier
-  const services = getServicesByTier(tier);
+async function buildBasicPanels(guild) {
+  // Get all free and premium services
+  const services = [...getServicesByTier('free'), ...getServicesByTier('premium')];
   
   // Fetch stock data for button labels
   const { query } = require('../database/hybridPool');
@@ -195,26 +188,17 @@ async function buildGenPanels(tier, guild) {
 
     // Ultra-styled embed WITHOUT ASCII
     const embed = new EmbedBuilder()
-      .setTitle(isPremium ? `👑 PRIMEGEN PREMIUM${titleSuffix}` : `✨ PRIMEGEN FREE${titleSuffix}`)
+      .setTitle(`✨ PRIMEGEN BASIC${titleSuffix}`)
       .setDescription(
         i === 0 ? (
-          isPremium
-            ? '### 💎 Premium Access\n\n' +
-            '> ⚡ **No queue** nor ads\n' +
-            '> 🏆 Guaranteed **high quality** accounts\n' +
-            '> 📩 **Instant** delivery in DMs\n' +
-            '> 👑 24/7 Priority Support\n\n' +
-            '### 📦 Included Services\n' +
-            `${serviceList}\n\n` +
-            '**👇 Click a button below to generate!**'
-            : '### 🎁 Free Access\n\n' +
-            '> 🔄 Stock updated **in real time**\n' +
-            '> 🌍 Access to a wide catalog of services\n' +
-            '> 💬 Remember to leave a **#proof**\n' +
-            '> 💖 Status: `.gg/primegen`\n\n' +
-            '### 📦 Available Services\n' +
-            `${serviceList}\n\n` +
-            '**👇 Click a button below to generate!**'
+          '### 🎁 Free & Premium Access\n\n' +
+          '> 🔄 Stock updated **in real time**\n' +
+          '> 🌍 Access to a wide catalog of services\n' +
+          '> 💬 Remember to leave a **#proof**\n' +
+          '> 💎 Support: `.gg/primegen`\n\n' +
+          '### 📦 Available Services\n' +
+          `${serviceList}\n\n` +
+          '**👇 Click a button below to generate!**'
         ) : (
           '### 📦 More services...\n\n' +
           `${serviceList}\n\n` +
@@ -223,7 +207,7 @@ async function buildGenPanels(tier, guild) {
       )
       .setColor(COLORS.FREE)
       .setFooter({ 
-        text: (isPremium ? '👑 PrimeGen Premium • Ultra Fast' : '✨ PrimeGen • Free Access') + titleSuffix,
+        text: '✨ PrimeGen • Basic Access' + titleSuffix,
         iconURL: 'https://i.goopics.net/2eukvn.gif'
       })
       .setTimestamp();
@@ -245,9 +229,9 @@ async function buildGenPanels(tier, guild) {
       const stockCount = stockData[service.id] || 0;
       
       const button = new ButtonBuilder()
-        .setCustomId(`gen_${tier}_${service.id}`)
+        .setCustomId(`gen_${service.tier}_${service.id}`)
         .setLabel(`${service.label.substring(0, 60)} [${stockCount}]`)
-        .setStyle(stockCount > 0 ? ButtonStyle.Secondary : ButtonStyle.Danger)
+        .setStyle(stockCount > 0 ? (service.tier === 'premium' ? ButtonStyle.Primary : ButtonStyle.Secondary) : ButtonStyle.Danger)
         .setDisabled(stockCount === 0);
 
       // Set emoji (custom object or default string)
@@ -648,4 +632,4 @@ async function buildPrimeStockPanel(guild) {
   return { embed, components: [] };
 }
 
-module.exports = { command, execute, buildGenPanels, buildPrimePanel, buildPrimeStockPanel, buildStockPanel, buildFAQPanel, buildShopPanel };
+module.exports = { command, execute, buildBasicPanels, buildPrimePanel, buildPrimeStockPanel, buildStockPanel, buildFAQPanel, buildShopPanel };
