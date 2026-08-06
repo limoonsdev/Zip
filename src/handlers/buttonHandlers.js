@@ -589,7 +589,7 @@ async function handleShopSubmitPayment(interaction) {
 
   const imageInput = new TextInputBuilder()
     .setCustomId('payment_image_url')
-    .setLabel('Image Proof URL (Imgur, Discord link) Optional')
+    .setLabel('Image Proof URL (Imgur, Discord) Optional')
     .setStyle(TextInputStyle.Short)
     .setRequired(false)
     .setMaxLength(300);
