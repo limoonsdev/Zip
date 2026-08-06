@@ -8,6 +8,7 @@ const { getLogger } = require('../utils/logger');
 const { EMOJIS } = require('../config/constants');
 const { getServiceById } = require('../config/services');
 const { query } = require('../database/hybridPool');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 
 const logger = getLogger();
 
