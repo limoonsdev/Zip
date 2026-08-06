@@ -59,7 +59,7 @@ async function execute(interaction) {
       break;
     }
     case 'gen_prime': {
-      panelsToDeploy = await buildGenPanels('prime', interaction.guild);
+      panelsToDeploy = await buildPrimePanel(interaction.guild);
       break;
     }
     case 'prime_stock': {
@@ -165,11 +165,25 @@ async function buildBasicPanels(guild) {
     // Silently continue if stock fetch fails
   }
 
+  // Only keep services that have stock > 0
+  const availableServices = services.filter(service => (stockData[service.id] || 0) > 0);
+
   const panels = [];
   
+  if (availableServices.length === 0) {
+    const embed = new EmbedBuilder()
+      .setTitle('✨ PRIMEGEN BASIC')
+      .setDescription('**Aucun service n\'est disponible pour le moment !**\n\nRevenez plus tard lors du prochain réassort.')
+      .setColor(COLORS.FREE)
+      .setImage(PANEL_BANNER_URL)
+      .setFooter({ text: '✨ PrimeGen • Basic Access', iconURL: 'https://i.goopics.net/2eukvn.gif' })
+      .setTimestamp();
+    return [{ embed, components: [] }];
+  }
+  
   // Split services into chunks of 25 (Discord max components per message)
-  for (let i = 0; i < services.length; i += 25) {
-    const chunk = services.slice(i, i + 25);
+  for (let i = 0; i < availableServices.length; i += 25) {
+    const chunk = availableServices.slice(i, i + 25);
     
     // Build service list with emojis for the description
     // Format nicely as a blockquote grid
@@ -231,8 +245,7 @@ async function buildBasicPanels(guild) {
       const button = new ButtonBuilder()
         .setCustomId(`gen_${service.tier}_${service.id}`)
         .setLabel(`${service.label.substring(0, 60)} [${stockCount}]`)
-        .setStyle(stockCount > 0 ? (service.tier === 'premium' ? ButtonStyle.Primary : ButtonStyle.Secondary) : ButtonStyle.Danger)
-        .setDisabled(stockCount === 0);
+        .setStyle(service.tier === 'premium' ? ButtonStyle.Primary : ButtonStyle.Secondary);
 
       // Set emoji (custom object or default string)
       if (typeof emoji === 'string') {
@@ -493,11 +506,25 @@ async function buildPrimePanel(guild) {
     // Silently continue if stock fetch fails
   }
 
+  // Only keep services that have stock > 0
+  const availableServices = services.filter(service => (stockData[service.id] || 0) > 0);
+
   const panels = [];
 
+  if (availableServices.length === 0) {
+    const embed = new EmbedBuilder()
+      .setTitle('💎 PRIMEGEN PRIME')
+      .setDescription('**Aucun service Prime n\'est disponible pour le moment !**\n\nRevenez plus tard lors du prochain réassort.')
+      .setColor('#FFD700')
+      .setImage(PANEL_BANNER_URL)
+      .setFooter({ text: '💎 PrimeGen Prime • Ultra Exclusive', iconURL: 'https://i.goopics.net/2eukvn.gif' })
+      .setTimestamp();
+    return [{ embed, components: [] }];
+  }
+
   // Split services into chunks of 25 (Discord max components per message)
-  for (let i = 0; i < services.length; i += 25) {
-    const chunk = services.slice(i, i + 25);
+  for (let i = 0; i < availableServices.length; i += 25) {
+    const chunk = availableServices.slice(i, i + 25);
 
     // Build service list with emojis for the description
     let serviceList = '> ';
@@ -558,8 +585,7 @@ async function buildPrimePanel(guild) {
       const button = new ButtonBuilder()
         .setCustomId(`gen_prime_${service.id}`)
         .setLabel(`${service.label.substring(0, 60)} [${stockCount}]`)
-        .setStyle(stockCount > 0 ? ButtonStyle.Success : ButtonStyle.Danger)
-        .setDisabled(stockCount === 0);
+        .setStyle(ButtonStyle.Success);
 
       // Set emoji (custom object or default string)
       if (typeof emoji === 'string') {
