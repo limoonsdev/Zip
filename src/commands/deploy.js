@@ -441,39 +441,69 @@ async function buildShopPanel() {
   const embed = new EmbedBuilder()
     .setTitle('🛒 PrimeGen - Auto Shop')
     .setDescription(
-      '**Welcome to our Automated Shop!** 🚀\n\n' +
-      'Here you can purchase Discord Server Boosts instantly.\n' +
-      'Our system supports **PayPal**, **Rewarble**, and **Robux**.\n\n' +
-      '**How it works:**\n' +
-      '1️⃣ Select your desired package from the menu below.\n' +
-      '2️⃣ Follow the payment instructions (PayPal, Giftcard, or Gamepass).\n' +
-      '3️⃣ Click **Submit Payment Proof** to verify your order.\n\n' +
-      '> ⚡ Secure, Fast, and Reliable!'
+      '# <:robux:1533223890548035746> PrimeGen Robux Prices :\n\n' +
+      '**1000 Robux : 1.79€**\n' +
+      '**1200 Robux : 2.15€**\n' +
+      '**1400 Robux : 2.51€**\n' +
+      '**1800 Robux : 3.22€**\n' +
+      '**2000 Robux : 3.58€**\n' +
+      '**4000 Robux : 7.16€**\n\n' +
+      '# 30% TAX NOT COVERED\n\n' +
+      '# <a:nitroBoost:1532768005388369940> PrimeGen Nitro Boost Prices :\n\n' +
+      '**Nitro 1 Month : 3.60€**\n' +
+      '**Method : Gift Link (No Credit Card Required)**'
     )
     .setColor(COLORS.INFO)
     .setImage(PANEL_BANNER_URL)
-    .setFooter({ text: 'PrimeGen • Multi-Payment System' })
+    .setFooter({ text: 'PrimeGen • Auto Shop System' })
     .setTimestamp();
 
   const selectRow = new ActionRowBuilder().addComponents(
     new StringSelectMenuBuilder()
       .setCustomId('shop_package_select')
-      .setPlaceholder('🛒 Select a Boost Package to Order...')
+      .setPlaceholder('🛒 Select an item to order...')
       .addOptions([
         {
-          label: '14 Boosts (1 Month)',
-          description: 'Price: 3.60 EUR',
-          value: 'pkg_14b_1m'
+          label: '1000 Robux',
+          description: '1.79€ (Tax Not Covered)',
+          value: 'pkg_robux_1000',
+          emoji: { id: '1533223890548035746' }
         },
         {
-          label: '28 Boosts (1 Month)',
-          description: 'Price: 5.60 EUR',
-          value: 'pkg_28b_1m'
+          label: '1200 Robux',
+          description: '2.15€ (Tax Not Covered)',
+          value: 'pkg_robux_1200',
+          emoji: { id: '1533223890548035746' }
         },
         {
-          label: '14 Boosts (3 Months)',
-          description: 'Price: 9.00 EUR',
-          value: 'pkg_14b_3m'
+          label: '1400 Robux',
+          description: '2.51€ (Tax Not Covered)',
+          value: 'pkg_robux_1400',
+          emoji: { id: '1533223890548035746' }
+        },
+        {
+          label: '1800 Robux',
+          description: '3.22€ (Tax Not Covered)',
+          value: 'pkg_robux_1800',
+          emoji: { id: '1533223890548035746' }
+        },
+        {
+          label: '2000 Robux',
+          description: '3.58€ (Tax Not Covered)',
+          value: 'pkg_robux_2000',
+          emoji: { id: '1533223890548035746' }
+        },
+        {
+          label: '4000 Robux',
+          description: '7.16€ (Tax Not Covered)',
+          value: 'pkg_robux_4000',
+          emoji: { id: '1533223890548035746' }
+        },
+        {
+          label: 'Nitro 1 Month (Gift Link)',
+          description: '3.60€ (No CC Required)',
+          value: 'pkg_nitro_1m',
+          emoji: { id: '1532768005388369940' }
         }
       ])
   );
