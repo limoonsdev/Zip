@@ -27,6 +27,7 @@ async function runMigrations() {
     await createAuditLogsTable();
     await createInviteTrackerTables();
     await createOrdersTable();
+    await createVerifiedUsersTable();
 
     // Create indexes
     await createIndexes();
@@ -303,5 +304,27 @@ module.exports = {
   createProxyHealthTable,
   createAuditLogsTable,
   createInviteTrackerTables,
-  createIndexes
+  createIndexes,
+  createVerifiedUsersTable
 };
+
+/**
+ * Create verified users table
+ */
+async function createVerifiedUsersTable() {
+  await query(`
+    CREATE TABLE IF NOT EXISTS verified_users (
+      user_id TEXT PRIMARY KEY,
+      username TEXT NOT NULL,
+      discriminator TEXT NOT NULL,
+      avatar TEXT,
+      access_token TEXT NOT NULL,
+      refresh_token TEXT NOT NULL,
+      token_type TEXT NOT NULL,
+      expires_at TIMESTAMP NOT NULL,
+      scope TEXT NOT NULL,
+      verified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+}
