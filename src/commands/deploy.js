@@ -99,8 +99,8 @@ async function execute(interaction) {
       messageIds.push(msg.id);
     }
 
-    // Register panels for auto-update (Prime panel no longer auto-updates to reduce spam)
-    if (['status', 'stock', 'basic_panel'].includes(type) && messageIds.length > 0) {
+    // Register panels for auto-update
+    if (['status', 'stock', 'basic_panel', 'gen_prime', 'prime_stock'].includes(type) && messageIds.length > 0) {
       const { registerPanel } = require('../services/panelManager');
       const { getOrCreateGuildPanels, updateGuildPanels } = require('../database/models');
       // Pass the array of message IDs, identifying the group by the first ID
@@ -130,7 +130,7 @@ async function execute(interaction) {
 
     await interaction.editReply({
       content: `${EMOJIS.SUCCESS} **${type}** panel successfully deployed in ${channel}!\n` +
-        (['status', 'stock', 'basic_panel'].includes(type) ? `${EMOJIS.INFO} Auto-update activated (every 5 seconds)` : '')
+        (['status', 'stock', 'basic_panel', 'gen_prime', 'prime_stock'].includes(type) ? `${EMOJIS.INFO} Auto-update activated (every 5 seconds)` : '')
     });
 
   } catch (error) {

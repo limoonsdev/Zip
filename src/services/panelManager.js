@@ -80,7 +80,7 @@ async function buildStatusEmbed(guild) {
  */
 function registerPanel(messageIdInput, channelId, guildId, type, client) {
   // Only update supported panels
-  if (!['status', 'stock', 'basic_panel'].includes(type)) {
+  if (!['status', 'stock', 'basic_panel', 'gen_prime', 'prime_stock'].includes(type)) {
     return;
   }
 
@@ -109,6 +109,13 @@ function registerPanel(messageIdInput, channelId, guildId, type, client) {
       } else if (type === 'basic_panel') {
         const { buildBasicPanels } = require('../commands/deploy');
         newPanels = await buildBasicPanels(guild);
+      } else if (type === 'gen_prime') {
+        const { buildPrimePanel } = require('../commands/deploy');
+        newPanels = await buildPrimePanel(guild);
+      } else if (type === 'prime_stock') {
+        const { buildPrimeStockPanel } = require('../commands/deploy');
+        const primeStockPanel = await buildPrimeStockPanel(guild);
+        newPanels = [{ embed: primeStockPanel.embed, components: primeStockPanel.components }];
       }
 
       // Update each message
