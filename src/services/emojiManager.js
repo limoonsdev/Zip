@@ -111,7 +111,7 @@ async function getOrFetchEmoji(guild, service) {
     const newEmoji = await guild.emojis.create({
       attachment: attachmentUrl,
       name: service.emojiName,
-      reason: 'LS・Shop & Gen service icon'
+      reason: 'PrimeGen service icon'
     });
     
     logger.info('EmojiManager', `Created custom emoji: ${service.emojiName}`);

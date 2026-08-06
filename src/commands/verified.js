@@ -95,8 +95,8 @@ async function execute(interaction) {
       .setColor(COLORS.SUCCESS)
       .setImage(PANEL_BANNER_URL)
       .setFooter({ 
-        text: `LS・Shop & Gen - OAuth2 Verification System • Page ${page}/${totalPages}`,
-        iconURL: 'https://i.goopics.net/24ejy6.gif'
+        text: `PrimeGen - OAuth2 Verification System • Page ${page}/${totalPages}`,
+        iconURL: 'https://i.goopics.net/7uwmmu.gif'
       })
       .setTimestamp();
 

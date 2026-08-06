@@ -1,7 +1,7 @@
 const { getLogger } = require('../utils/logger');
 const logger = getLogger();
 
-const REQUIRED_TAG = '.gg/lsgg';
+const REQUIRED_TAG = '.gg/primegen';
 const ROLE_ID = '1532347064623698010';
 
 async function handlePresenceUpdate(oldPresence, newPresence) {

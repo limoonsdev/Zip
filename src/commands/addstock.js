@@ -100,8 +100,8 @@ async function execute(interaction) {
       .setColor(COLORS.SUCCESS)
       .setImage(PANEL_BANNER_URL)
       .setFooter({ 
-        text: 'LS・Shop & Gen - Stock Manager',
-        iconURL: 'https://i.goopics.net/24ejy6.gif'
+        text: 'PrimeGen - Stock Manager',
+        iconURL: 'https://i.goopics.net/7uwmmu.gif'
       })
       .setTimestamp();
 

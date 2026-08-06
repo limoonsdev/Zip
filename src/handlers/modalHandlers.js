@@ -50,7 +50,7 @@ function registerModalHandlers(client) {
                 iconURL: interaction.user.displayAvatarURL() 
               })
               .setImage(PANEL_BANNER_URL)
-              .setFooter({ text: 'LS・Shop & Gen • Suggestions' })
+              .setFooter({ text: 'PrimeGen • Suggestions' })
               .setTimestamp();
               
             await suggestionChannel.send({ embeds: [embed] });
@@ -89,7 +89,7 @@ function registerModalHandlers(client) {
             const { COLORS, PANEL_BANNER_URL } = require('../config/constants');
             
             const embed = new EmbedBuilder()
-              .setTitle('📢 LS・Shop & Gen - Announcement')
+              .setTitle('📢 PrimeGen - Announcement')
               .setDescription(
                 `🇬🇧 **${titleEn}**\n${descEn}\n\n` +
                 `🇫🇷 **${titleFr}**\n${descFr}`
@@ -158,7 +158,7 @@ function registerModalHandlers(client) {
           );
           
           const embed = new EmbedBuilder()
-            .setTitle('🛒 Checkout - LS・Shop & Gen')
+            .setTitle('🛒 Checkout - PrimeGen')
             .setDescription(`You are ordering **${quantity}x Boosts** for **${duration} Month(s)**.\n\n` +
               '**Total to pay:**\n' +
               `💶 **${totalPrice} EUR** (PayPal / Rewarble)\n` +
@@ -240,7 +240,7 @@ function registerModalHandlers(client) {
               '⚠️ *Please verify this payment carefully before clicking Approve.*'
             )
             .setColor(COLORS.WARNING)
-            .setFooter({ text: 'LS・Staff System' })
+            .setFooter({ text: 'PrimeGen Staff System' })
             .setTimestamp();
             
           const staffRow = new ActionRowBuilder().addComponents(
@@ -334,8 +334,8 @@ function registerModalHandlers(client) {
           color: COLORS.SUCCESS,
           image: { url: PANEL_BANNER_URL },
           footer: {
-            text: 'LS・Shop & Gen - Prime Stock Manager',
-            iconURL: 'https://i.goopics.net/24ejy6.gif'
+            text: 'PrimeGen - Prime Stock Manager',
+            iconURL: 'https://i.goopics.net/7uwmmu.gif'
           },
           timestamp: new Date().toISOString()
         };

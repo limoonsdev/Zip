@@ -22,7 +22,7 @@ async function execute(interaction) {
     .setDescription(`> ${EMOJIS.INFO} **The advanced file checking system is currently under development.**\n> It will be available very soon with premium proxies and ultra-fast validation!`)
     .setColor(COLORS.WARNING)
     .setImage(PANEL_BANNER_URL)
-    .setFooter({ text: 'LS・Shop & Gen • Under Construction' });
+    .setFooter({ text: 'PrimeGen - Under Construction' });
 
   await interaction.reply({ embeds: [embed], flags: 64 });
 }

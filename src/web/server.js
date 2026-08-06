@@ -199,7 +199,7 @@ function buildSuccessPage(username, discriminator, avatar) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vérification Réussie - LS・Shop & Gen</title>
+  <title>Vérification Réussie - PrimeGen</title>
   <style>
     * {
       margin: 0;
@@ -343,18 +343,28 @@ function buildSuccessPage(username, discriminator, avatar) {
       font-size: 18px;
       font-weight: 600;
       transition: transform 0.2s, box-shadow 0.2s;
-      margin-top: 20px;
+      color: #57F287;
+    }
+    
+    .button {
+      background: #5865F2;
+      color: white;
+      text-decoration: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-weight: bold;
+      display: inline-block;
+      transition: background 0.3s;
     }
     
     .button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.5);
+      background: #4752C4;
     }
     
     .footer {
-      margin-top: 30px;
-      color: #999;
-      font-size: 14px;
+      margin-top: 20px;
+      font-size: 12px;
+      color: #666;
     }
   </style>
 </head>
@@ -365,7 +375,7 @@ function buildSuccessPage(username, discriminator, avatar) {
     </div>
     
     <h1>Vérification Réussie!</h1>
-    <p class="subtitle">Bienvenue sur LS・Shop & Gen</p>
+    <p class="subtitle">Bienvenue sur PrimeGen</p>
     
     <div class="user-info">
       <img src="${avatarUrl}" alt="Avatar" class="avatar">
@@ -392,7 +402,7 @@ function buildSuccessPage(username, discriminator, avatar) {
       </div>
     </div>
     
-    <a href="https://discord.gg/lsshop" class="button">Retour sur Discord</a>
+    <a href="https://discord.gg/primegen" class="button">Retour sur Discord</a>
     
     <div class="footer">
       Tu peux fermer cette page en toute sécurité
@@ -413,7 +423,7 @@ function buildErrorPage(message) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Erreur - LS・Shop & Gen</title>
+  <title>Erreur - PrimeGen</title>
   <style>
     * {
       margin: 0;

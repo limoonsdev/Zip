@@ -132,7 +132,7 @@ module.exports = CONSTANTS;
 // =====================================================
 // DESIGN & UI CONSTANTS (ULTRA-PREMIUM)
 // =====================================================
-const PANEL_BANNER_URL = 'https://i.goopics.net/24ejy6.gif';
+const PANEL_BANNER_URL = 'https://i.goopics.net/7uwmmu.gif';
 
 const COLORS = {
   FREE: '#2B2D31',        // Dark grey

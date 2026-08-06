@@ -134,7 +134,7 @@ async function handleGenButton(interaction) {
         `**Stock remaining:** ${stock - 1}`
       ].filter(Boolean).join('\n'),
       color: tier === 'premium' ? 0xFFD700 : 0x2B2D31,
-      footer: { text: 'LS・Shop & Gen Generator' },
+      footer: { text: 'PrimeGen Generator' },
       timestamp: new Date().toISOString()
     };
 
@@ -197,7 +197,7 @@ async function handleVerifyButton(interaction) {
     }
     
     await interaction.editReply({
-      content: `${EMOJIS.SUCCESS} **Verification successful!**\n${EMOJIS.INFO} Welcome to LS・Shop & Gen!`
+      content: `${EMOJIS.SUCCESS} **Verification successful!**\n${EMOJIS.INFO} Welcome to PrimeGen!`
     });
 
     logger.info('Verify', `User verified: ${member.user.tag}`, {
@@ -348,7 +348,7 @@ async function handleTicketButton(interaction) {
       .setColor(COLORS.INFO)
       .setThumbnail(interaction.user.displayAvatarURL())
       .setImage(PANEL_BANNER_URL)
-      .setFooter({ text: 'LS・Shop & Gen Support' })
+      .setFooter({ text: 'PrimeGen Support' })
       .setTimestamp();
       
     const closeBtn = new ActionRowBuilder().addComponents(
@@ -516,7 +516,7 @@ async function handleShopApprove(interaction) {
         .setDescription(`Congratulations <@${order.user_id}>! 🎉\n\nYour payment for **${order.product}** has been successfully verified.\nYour order will now be processed by our automated system!`)
         .setColor(COLORS.SUCCESS)
         .setImage(require('../config/constants').PANEL_BANNER_URL || null)
-        .setFooter({ text: `Order ID: ${dbId} • LS・Shop & Gen` })
+        .setFooter({ text: `Order ID: ${dbId} • PrimeGen` })
         .setTimestamp();
       await user.send({ embeds: [embed] });
     } catch (e) {
@@ -563,7 +563,7 @@ async function handleShopReject(interaction) {
         .setTitle('❌ PAYMENT REJECTED')
         .setDescription(`Hello <@${order.user_id}>,\n\nUnfortunately, your payment for **${order.product}** could not be verified or was invalid.\nIf you believe this is an error, please open a regular support ticket.`)
         .setColor(COLORS.ERROR)
-        .setFooter({ text: `Order ID: ${dbId} • LS・Shop & Gen` })
+        .setFooter({ text: `Order ID: ${dbId} • PrimeGen` })
         .setTimestamp();
       await user.send({ embeds: [embed] });
     } catch (e) {

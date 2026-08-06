@@ -100,7 +100,7 @@ function registerSelectHandlers(client) {
       const embed = new EmbedBuilder()
         .setTitle('💳 SECURE CHECKOUT')
         .setDescription(
-          'Thank you for choosing **LS・Shop & Gen**! You are about to purchase:\n' +
+          'Thank you for choosing **PrimeGen**! You are about to purchase:\n' +
           `> 📦 **Product:** \`${product}\`\n` +
           `> 💶 **Price (EUR):** \`${totalPrice.toFixed(2)}€\`\n` +
           `> 💎 **Price (R$):** \`${robuxPrice} Robux\`\n\n` +
@@ -119,7 +119,7 @@ function registerSelectHandlers(client) {
         )
         .setImage(PANEL_BANNER_URL || null)
         .setColor(COLORS.INFO)
-        .setFooter({ text: `Order ID: ${orderId} • LS・Shop & Gen` })
+        .setFooter({ text: `Order ID: ${orderId} • PrimeGen` })
         .setTimestamp();
         
       const row = new ActionRowBuilder().addComponents(

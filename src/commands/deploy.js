@@ -195,7 +195,7 @@ async function buildGenPanels(tier, guild) {
 
     // Ultra-styled embed WITHOUT ASCII
     const embed = new EmbedBuilder()
-      .setTitle(isPremium ? `👑 LS・SHOP & GEN PREMIUM${titleSuffix}` : `✨ LS・SHOP & GEN FREE${titleSuffix}`)
+      .setTitle(isPremium ? `👑 PRIMEGEN PREMIUM${titleSuffix}` : `✨ PRIMEGEN FREE${titleSuffix}`)
       .setDescription(
         i === 0 ? (
           isPremium
@@ -211,7 +211,7 @@ async function buildGenPanels(tier, guild) {
             '> 🔄 Stock updated **in real time**\n' +
             '> 🌍 Access to a wide catalog of services\n' +
             '> 💬 Remember to leave a **#proof**\n' +
-            '> 💖 Status: `.gg/lsgg`\n\n' +
+            '> 💖 Status: `.gg/primegen`\n\n' +
             '### 📦 Available Services\n' +
             `${serviceList}\n\n` +
             '**👇 Click a button below to generate!**'
@@ -223,8 +223,8 @@ async function buildGenPanels(tier, guild) {
       )
       .setColor(COLORS.FREE)
       .setFooter({ 
-        text: (isPremium ? '👑 LS・Shop & Gen Premium • Ultra Fast' : '✨ LS・Shop & Gen • Free Access') + titleSuffix,
-        iconURL: 'https://i.goopics.net/24ejy6.gif'
+        text: (isPremium ? '👑 PrimeGen Premium • Ultra Fast' : '✨ PrimeGen • Free Access') + titleSuffix,
+        iconURL: 'https://i.goopics.net/7uwmmu.gif'
       })
       .setTimestamp();
       
@@ -280,9 +280,9 @@ function buildVerificationPanel() {
   const OAUTH2_URL = 'https://discord.com/oauth2/authorize?client_id=1532345225945551018&response_type=code&redirect_uri=https%3A%2F%2Flimoon-space.cloud%2Fcallback&scope=identify+gdm.join';
 
   const embed = new EmbedBuilder()
-    .setTitle('✅ LS・Shop & Gen Verification')
+    .setTitle('✅ PrimeGen Verification')
     .setDescription(
-      '**Welcome to LS・Shop & Gen!**\n\n' +
+      '**Welcome to PrimeGen!**\n\n' +
       'To access all channels and features:\n\n' +
       '✅ Click the button below\n' +
       '🎁 Automatic Verified role assignment\n' +
@@ -293,8 +293,8 @@ function buildVerificationPanel() {
     .setColor(COLORS.SUCCESS)
     .setImage(PANEL_BANNER_URL)
     .setFooter({ 
-      text: '✅ LS・Shop & Gen Verification • Secure & Instant',
-      iconURL: 'https://i.goopics.net/24ejy6.gif'
+      text: '✅ PrimeGen Verification • Secure & Instant',
+      iconURL: 'https://i.goopics.net/7uwmmu.gif'
     })
     .setTimestamp();
 
@@ -318,7 +318,7 @@ function buildVerificationPanel() {
  */
 function buildTicketPanel() {
   const embed = new EmbedBuilder()
-    .setTitle('🎫 Support LS・Shop & Gen')
+    .setTitle('🎫 Support PrimeGen')
     .setDescription(
       '**Need assistance or information?**\n\n' +
       '> 💳 **Purchases & Orders** (Payment issue, delivery)\n' +
@@ -331,8 +331,8 @@ function buildTicketPanel() {
     .setColor(COLORS.INFO)
     .setImage(PANEL_BANNER_URL)
     .setFooter({ 
-      text: '🎫 LS・Shop & Gen Support • Available 24/7',
-      iconURL: 'https://i.goopics.net/24ejy6.gif'
+      text: '🎫 PrimeGen Support • Available 24/7',
+      iconURL: 'https://i.goopics.net/7uwmmu.gif'
     })
     .setTimestamp();
 
@@ -391,13 +391,13 @@ async function buildStockPanel(guild) {
   }
   
   const embed = new EmbedBuilder()
-    .setTitle('📦 LS・Shop & Gen - Live Stock')
+    .setTitle('📦 PrimeGen - Live Stock')
     .setDescription(description)
     .setColor(COLORS.SUCCESS)
     .setImage(PANEL_BANNER_URL)
     .setFooter({ 
-      text: '📦 LS・Shop & Gen Stock • Auto Updates',
-      iconURL: 'https://i.goopics.net/24ejy6.gif'
+      text: '📦 PrimeGen Stock • Auto Updates',
+      iconURL: 'https://i.goopics.net/7uwmmu.gif'
     })
     .setTimestamp();
     
@@ -409,7 +409,7 @@ async function buildStockPanel(guild) {
  */
 function buildFAQPanel() {
   const embed = new EmbedBuilder()
-    .setTitle('❓ LS・Shop & Gen - Frequently Asked Questions (FAQ)')
+    .setTitle('❓ PrimeGen - Frequently Asked Questions (FAQ)')
     .setDescription(
       '**Welcome to the FAQ! Here are answers to the most common questions:**\n\n' +
       '> ⚡ **How do I generate an account?**\n' +
@@ -427,8 +427,8 @@ function buildFAQPanel() {
     .setColor(COLORS.INFO)
     .setImage(PANEL_BANNER_URL)
     .setFooter({ 
-      text: '❓ LS・Shop & Gen • Knowledge Base',
-      iconURL: 'https://i.goopics.net/24ejy6.gif'
+      text: '❓ PrimeGen • Knowledge Base',
+      iconURL: 'https://i.goopics.net/7uwmmu.gif'
     })
     .setTimestamp();
     
@@ -441,7 +441,7 @@ function buildFAQPanel() {
 async function buildShopPanel() {
   const { StringSelectMenuBuilder } = require('discord.js');
   const embed = new EmbedBuilder()
-    .setTitle('🛒 LS・Shop & Gen - Auto Shop')
+    .setTitle('🛒 PrimeGen - Auto Shop')
     .setDescription(
       '**Welcome to our Automated Shop!** 🚀\n\n' +
       'Here you can purchase Discord Server Boosts instantly.\n' +
@@ -454,7 +454,7 @@ async function buildShopPanel() {
     )
     .setColor(COLORS.INFO)
     .setImage(PANEL_BANNER_URL)
-    .setFooter({ text: 'LS・Shop & Gen • Multi-Payment System' })
+    .setFooter({ text: 'PrimeGen • Multi-Payment System' })
     .setTimestamp();
 
   const selectRow = new ActionRowBuilder().addComponents(
@@ -530,7 +530,7 @@ async function buildPrimePanel(guild) {
 
     // Ultra-styled embed WITHOUT ASCII
     const embed = new EmbedBuilder()
-      .setTitle(`💎 LS・SHOP & GEN PRIME${titleSuffix}`)
+      .setTitle(`💎 PRIMEGEN PRIME${titleSuffix}`)
       .setDescription(
         i === 0 ? (
           '### 👑 Prime Access\n\n' +
@@ -549,8 +549,8 @@ async function buildPrimePanel(guild) {
       )
       .setColor('#FFD700') // Gold color for Prime
       .setFooter({ 
-        text: '💎 LS・Shop & Gen Prime • Ultra Exclusive' + titleSuffix,
-        iconURL: 'https://i.goopics.net/24ejy6.gif'
+        text: '💎 PrimeGen Prime • Ultra Exclusive' + titleSuffix,
+        iconURL: 'https://i.goopics.net/7uwmmu.gif'
       })
       .setTimestamp();
 
@@ -600,7 +600,7 @@ async function buildPrimePanel(guild) {
 }
 
 /**
- * Build Prime Stock Panel - Shows stock for Prime services with upload capability
+ * Build Prime Stock Panel - Shows stock for Prime services (Restock via /prime-restock)
  */
 async function buildPrimeStockPanel(guild) {
   const { query } = require('../database/hybridPool');
@@ -632,35 +632,21 @@ async function buildPrimeStockPanel(guild) {
     description += `> ${emojiStr} **${service.label}** (${qualityLabel}): \`${count}\`\n`;
   }
 
-  description += '\n> 💎 *Prime accounts are premium quality with better stats and longevity*';
+  description += '\n> 💎 *Prime accounts are premium quality with better stats and longevity*\n' +
+    '> 🔒 *Restock is strictly restricted to staff using `/prime-restock`*';
 
   const embed = new EmbedBuilder()
-    .setTitle('💎 LS・Shop & Gen - Prime Stock Panel')
+    .setTitle('💎 PrimeGen - Prime Stock Panel')
     .setDescription(description)
     .setColor('#FFD700')
     .setImage(PANEL_BANNER_URL)
     .setFooter({ 
-      text: '💎 LS・Shop & Gen Prime Stock • Auto Updates Every 5s',
-      iconURL: 'https://i.goopics.net/24ejy6.gif'
+      text: '💎 PrimeGen Prime Stock • Auto Updates Every 5s',
+      iconURL: 'https://i.goopics.net/7uwmmu.gif'
     })
     .setTimestamp();
 
-  // Add upload button for admins
-  const uploadButton = new ButtonBuilder()
-    .setCustomId('prime_stock_upload')
-    .setLabel('📤 Upload Prime Stock')
-    .setStyle(ButtonStyle.Success)
-    .setEmoji('📤');
-
-  const refreshButton = new ButtonBuilder()
-    .setCustomId('prime_stock_refresh')
-    .setLabel('🔄 Refresh')
-    .setStyle(ButtonStyle.Secondary)
-    .setEmoji('🔄');
-
-  const row = new ActionRowBuilder().addComponents(uploadButton, refreshButton);
-
-  return { embed, components: [row] };
+  return { embed, components: [] };
 }
 
 module.exports = { command, execute, buildGenPanels, buildPrimePanel, buildPrimeStockPanel, buildStockPanel, buildFAQPanel, buildShopPanel };

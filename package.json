@@ -1,7 +1,7 @@
 {
-  "name": "newgen-bot",
+  "name": "primegen-bot",
   "version": "2.5.0",
-  "description": "NextGen Bot - Ultra Edition with Advanced Features",
+  "description": "PrimeGen Bot - Ultra Edition with Advanced Features",
   "main": "src/index.js",
   "type": "commonjs",
   "scripts": {

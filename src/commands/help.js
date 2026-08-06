@@ -25,7 +25,7 @@ async function execute(interaction) {
   try {
     const embed = new EmbedBuilder()
       .setColor(0x0984E3)
-      .setTitle('📋 NextGen Bot - Help')
+      .setTitle('📋 PrimeGen Bot - Help')
       .setDescription('Here are all available commands:')
       .addFields(
         {
@@ -49,19 +49,19 @@ async function execute(interaction) {
           inline: false
         },
         {
-          name: '/info',
-          value: 'View information about a service\n`/info <service>`',
+          name: '/prime-restock',
+          value: 'Restock Prime stock with TXT/ULP file (Staff)\n`/prime-restock <fichier> <service>`',
           inline: false
         }
       )
       .addFields(
         {
           name: '💡 Tips',
-          value: '• Free tier users have access to free services\n• Premium users unlock all services\n• Use /check to verify credentials before sharing\n• Report issues with /report command',
+          value: '• Free tier users have access to free services\n• Premium users unlock all services\n• Status required: .gg/primegen',
           inline: false
         }
       )
-      .setFooter({ text: 'NextGen Bot v2.0' })
+      .setFooter({ text: 'PrimeGen Bot v2.5' })
       .setTimestamp();
 
     logger.debug('Command', 'Help command executed', {

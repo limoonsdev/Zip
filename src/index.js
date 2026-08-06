@@ -264,7 +264,7 @@ class NextGenBot {
    */
   async start() {
     try {
-      logger.info('Bot', '🚀 Starting NextGen Bot v2.5.0');
+      logger.info('Bot', '🚀 Starting PrimeGen Bot v2.5.0');
       logger.info('Bot', '✨ New features: Deploy panels, Config UI, Emoji manager, Hybrid DB');
 
       // Load and register commands

@@ -73,7 +73,7 @@ async function createOrder(amount, currency = 'EUR', description = 'Discord Boos
           }
         ],
         application_context: {
-          brand_name: 'LS Shop & Gen',
+          brand_name: 'PrimeGen',
           landing_page: 'NO_PREFERENCE',
           user_action: 'PAY_NOW',
           return_url: 'https://discord.com',

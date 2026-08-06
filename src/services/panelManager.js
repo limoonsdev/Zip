@@ -55,7 +55,7 @@ async function buildStatusEmbed(guild) {
   description += `${EMOJI_UP} 💾 **Database** • \`Online\`\n\n`;
 
   const embed = new EmbedBuilder()
-    .setTitle('📊 LS・Shop & Gen • Systems Status')
+    .setTitle('📊 PrimeGen • Systems Status')
     .setDescription(description)
     .addFields(
       {
@@ -67,8 +67,8 @@ async function buildStatusEmbed(guild) {
     .setColor(COLORS.INFO)
     .setImage(PANEL_BANNER_URL)
     .setFooter({ 
-      text: `LS・Shop & Gen • Systems Manager • ${new Date().toLocaleTimeString('fr-FR')}`,
-      iconURL: 'https://i.goopics.net/24ejy6.gif'
+      text: `PrimeGen • Systems Manager • ${new Date().toLocaleTimeString('fr-FR')}`,
+      iconURL: 'https://i.goopics.net/7uwmmu.gif'
     })
     .setTimestamp();
 

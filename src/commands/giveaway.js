@@ -24,7 +24,7 @@ async function execute(interaction) {
   const gagnants = interaction.options.getInteger('gagnants') || 1;
   
   const embed = new EmbedBuilder()
-    .setTitle('🎉 GIVEAWAY LS・SHOP & GEN')
+    .setTitle('🎉 GIVEAWAY PRIMEGEN')
     .setDescription(
       '**Participate for a chance to win:**\n\n' +
       `> 🎁 **Prize:** ${lot}\n` +

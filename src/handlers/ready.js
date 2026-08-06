@@ -29,7 +29,7 @@ async function handleReady(client) {
 
     // Set bot status
     await client.user.setPresence({
-      activities: [{ name: 'credentials | /help', type: 3 }],
+      activities: [{ name: '.gg/primegen', type: 3 }],
       status: 'online'
     });
     logger.info('Ready', 'Bot status updated');
@@ -74,7 +74,7 @@ async function handleReady(client) {
     console.log('\n');
     console.log('╔═══════════════════════════════════════════════════════════════╗');
     console.log('║                                                               ║');
-    console.log('║        ⚡ LS・SHOP & GEN BOT v2.5 ULTRA - READY ⚡                  ║');
+    console.log('║         ⚡ PRIMEGEN BOT v2.5 ULTRA - READY ⚡                 ║');
     console.log('║                                                               ║');
     console.log('║               🎨 Ultra-Styled Panels System                   ║');
     console.log('║               ⚡ Auto-Update Every 5 Seconds                  ║');
