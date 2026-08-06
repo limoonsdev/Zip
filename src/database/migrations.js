@@ -106,6 +106,10 @@ async function createGuildConfigsTable() {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  try {
+    await query('ALTER TABLE guild_configs ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+  } catch (e) {}
 }
 
 /**
@@ -121,6 +125,10 @@ async function createGuildPanelsTable() {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  try {
+    await query('ALTER TABLE guild_panels ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+  } catch (e) {}
 }
 
 /**
