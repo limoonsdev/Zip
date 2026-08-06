@@ -587,9 +587,17 @@ async function handleShopSubmitPayment(interaction) {
     .setRequired(true)
     .setMaxLength(200);
 
+  const imageInput = new TextInputBuilder()
+    .setCustomId('payment_image_url')
+    .setLabel('Image Proof URL (Imgur, Discord link) Optional')
+    .setStyle(TextInputStyle.Short)
+    .setRequired(false)
+    .setMaxLength(300);
+
   modal.addComponents(
     new ActionRowBuilder().addComponents(methodInput),
-    new ActionRowBuilder().addComponents(proofInput)
+    new ActionRowBuilder().addComponents(proofInput),
+    new ActionRowBuilder().addComponents(imageInput)
   );
 
   await interaction.showModal(modal);

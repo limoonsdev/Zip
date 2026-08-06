@@ -196,6 +196,12 @@ function registerModalHandlers(client) {
         
         const method = interaction.fields.getTextInputValue('payment_method');
         const proof = interaction.fields.getTextInputValue('payment_proof');
+        let imageUrl = '';
+        try {
+          imageUrl = interaction.fields.getTextInputValue('payment_image_url');
+        } catch (e) {
+          // Optional field
+        }
         
         try {
           const { query } = require('../database/hybridPool');
@@ -242,6 +248,10 @@ function registerModalHandlers(client) {
             .setColor(COLORS.WARNING)
             .setFooter({ text: 'PrimeGen Staff System' })
             .setTimestamp();
+            
+          if (imageUrl && imageUrl.startsWith('http')) {
+            staffEmbed.setImage(imageUrl);
+          }
             
           const staffRow = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
