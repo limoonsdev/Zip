@@ -335,7 +335,7 @@ function registerModalHandlers(client) {
           image: { url: PANEL_BANNER_URL },
           footer: {
             text: 'PrimeGen - Prime Stock Manager',
-            iconURL: 'https://i.goopics.net/7uwmmu.gif'
+            iconURL: 'https://i.goopics.net/2eukvn.gif'
           },
           timestamp: new Date().toISOString()
         };

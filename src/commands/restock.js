@@ -208,7 +208,7 @@ async function handleFileRestock(interaction, serviceId, service) {
       .setImage(PANEL_BANNER_URL)
       .setFooter({ 
         text: 'PrimeGen - Restock System',
-        iconURL: 'https://i.goopics.net/7uwmmu.gif'
+        iconURL: 'https://i.goopics.net/2eukvn.gif'
       })
       .setTimestamp();
 
@@ -310,7 +310,7 @@ async function handleGofileRestock(interaction, serviceId, service, gofileUrl) {
         `${EMOJIS.STOCK} **Total stock:** ${totalStock} accounts`
       )
       .setColor(COLORS.SUCCESS)
-      .setFooter({ text: 'PrimeGen GoFile Restock System', iconURL: 'https://i.goopics.net/7uwmmu.gif' })
+      .setFooter({ text: 'PrimeGen GoFile Restock System', iconURL: 'https://i.goopics.net/2eukvn.gif' })
       .setTimestamp();
 
     await interaction.editReply({ content: '', embeds: [embed] });

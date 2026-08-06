@@ -146,7 +146,7 @@ async function execute(interaction) {
       .setImage(PANEL_BANNER_URL)
       .setFooter({
         text: '💎 PrimeGen - Prime Restock System',
-        iconURL: 'https://i.goopics.net/7uwmmu.gif'
+        iconURL: 'https://i.goopics.net/2eukvn.gif'
       })
       .setTimestamp();
 

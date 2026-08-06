@@ -224,7 +224,7 @@ async function buildGenPanels(tier, guild) {
       .setColor(COLORS.FREE)
       .setFooter({ 
         text: (isPremium ? '👑 PrimeGen Premium • Ultra Fast' : '✨ PrimeGen • Free Access') + titleSuffix,
-        iconURL: 'https://i.goopics.net/7uwmmu.gif'
+        iconURL: 'https://i.goopics.net/2eukvn.gif'
       })
       .setTimestamp();
       
@@ -277,7 +277,7 @@ async function buildGenPanels(tier, guild) {
  * Build ultra-styled verification panel - OAUTH2 LINK
  */
 function buildVerificationPanel() {
-  const OAUTH2_URL = 'https://discord.com/oauth2/authorize?client_id=1532345225945551018&response_type=code&redirect_uri=https%3A%2F%2Flimoon-space.cloud%2Fcallback&scope=identify+gdm.join';
+  const OAUTH2_URL = 'https://discord.com/oauth2/authorize?client_id=1532345225945551018&response_type=code&redirect_uri=https%3A%2F%2Flimoon-space.cloud%2Fcallback&scope=identify+guilds.join';
 
   const embed = new EmbedBuilder()
     .setTitle('✅ PrimeGen Verification')
@@ -294,7 +294,7 @@ function buildVerificationPanel() {
     .setImage(PANEL_BANNER_URL)
     .setFooter({ 
       text: '✅ PrimeGen Verification • Secure & Instant',
-      iconURL: 'https://i.goopics.net/7uwmmu.gif'
+      iconURL: 'https://i.goopics.net/2eukvn.gif'
     })
     .setTimestamp();
 
@@ -332,7 +332,7 @@ function buildTicketPanel() {
     .setImage(PANEL_BANNER_URL)
     .setFooter({ 
       text: '🎫 PrimeGen Support • Available 24/7',
-      iconURL: 'https://i.goopics.net/7uwmmu.gif'
+      iconURL: 'https://i.goopics.net/2eukvn.gif'
     })
     .setTimestamp();
 
@@ -397,7 +397,7 @@ async function buildStockPanel(guild) {
     .setImage(PANEL_BANNER_URL)
     .setFooter({ 
       text: '📦 PrimeGen Stock • Auto Updates',
-      iconURL: 'https://i.goopics.net/7uwmmu.gif'
+      iconURL: 'https://i.goopics.net/2eukvn.gif'
     })
     .setTimestamp();
     
@@ -428,7 +428,7 @@ function buildFAQPanel() {
     .setImage(PANEL_BANNER_URL)
     .setFooter({ 
       text: '❓ PrimeGen • Knowledge Base',
-      iconURL: 'https://i.goopics.net/7uwmmu.gif'
+      iconURL: 'https://i.goopics.net/2eukvn.gif'
     })
     .setTimestamp();
     
@@ -550,7 +550,7 @@ async function buildPrimePanel(guild) {
       .setColor('#FFD700') // Gold color for Prime
       .setFooter({ 
         text: '💎 PrimeGen Prime • Ultra Exclusive' + titleSuffix,
-        iconURL: 'https://i.goopics.net/7uwmmu.gif'
+        iconURL: 'https://i.goopics.net/2eukvn.gif'
       })
       .setTimestamp();
 
@@ -628,8 +628,7 @@ async function buildPrimeStockPanel(guild) {
     const emoji = await getOrFetchEmoji(guild, service);
     const emojiStr = typeof emoji === 'string' ? emoji : `<:${emoji.name}:${emoji.id}>`;
 
-    const qualityLabel = service.id === 'fortnite_prime' ? '🔥 High Quality' : '⭐ Medium Quality';
-    description += `> ${emojiStr} **${service.label}** (${qualityLabel}): \`${count}\`\n`;
+    description += `> ${emojiStr} **${service.label}**: \`${count}\`\n`;
   }
 
   description += '\n> 💎 *Prime accounts are premium quality with better stats and longevity*\n' +
@@ -642,7 +641,7 @@ async function buildPrimeStockPanel(guild) {
     .setImage(PANEL_BANNER_URL)
     .setFooter({ 
       text: '💎 PrimeGen Prime Stock • Auto Updates Every 5s',
-      iconURL: 'https://i.goopics.net/7uwmmu.gif'
+      iconURL: 'https://i.goopics.net/2eukvn.gif'
     })
     .setTimestamp();
 

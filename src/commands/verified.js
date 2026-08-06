@@ -44,7 +44,7 @@ async function execute(interaction) {
       return interaction.editReply({
         content: `${EMOJIS.INFO} No verified users at the moment.\n\n` +
           '**Verification link:**\n' +
-          `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&scope=identify+gdm.join`
+          `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&scope=identify+guilds.join`
       });
     }
 
@@ -96,14 +96,14 @@ async function execute(interaction) {
       .setImage(PANEL_BANNER_URL)
       .setFooter({ 
         text: `PrimeGen - OAuth2 Verification System • Page ${page}/${totalPages}`,
-        iconURL: 'https://i.goopics.net/7uwmmu.gif'
+        iconURL: 'https://i.goopics.net/2eukvn.gif'
       })
       .setTimestamp();
 
     // Add verification link
     embed.addFields({
       name: '🔗 Verification Link',
-      value: `[Click here to verify yourself](https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&scope=identify+gdm.join)`,
+      value: `[Click here to verify yourself](https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&scope=identify+guilds.join)`,
       inline: false
     });
 
