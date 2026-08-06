@@ -35,7 +35,7 @@ app.get('/callback', async (req, res) => {
 
   if (!code) {
     logger.warn('OAuth', 'Missing code parameter');
-    return res.status(400).send(buildErrorPage('Code manquant'));
+    return res.status(400).send(buildErrorPage('Missing authorization code'));
   }
 
   try {
@@ -142,14 +142,14 @@ app.get('/callback', async (req, res) => {
     }
 
     // Send success page
-    res.send(buildSuccessPage(username, discriminator, avatar));
+    res.send(buildSuccessPage(userId, username, discriminator, avatar));
 
   } catch (error) {
     logger.error('OAuth', 'Verification failed', {
       error: error.message,
       response: error.response?.data
     });
-    res.status(500).send(buildErrorPage('Erreur lors de la vérification'));
+    res.status(500).send(buildErrorPage('An error occurred during verification'));
   }
 });
 
@@ -192,19 +192,19 @@ app.get('/api/verified', async (req, res) => {
 /**
  * Build success page
  */
-function buildSuccessPage(username, discriminator, avatar) {
+function buildSuccessPage(userId, username, discriminator, avatar) {
   const avatarUrl = avatar 
-    ? `https://cdn.discordapp.com/avatars/${username}/${avatar}.png`
+    ? `https://cdn.discordapp.com/avatars/${userId}/${avatar}.png`
     : 'https://cdn.discordapp.com/embed/avatars/0.png';
   const bannerUrl = 'https://i.goopics.net/2eukvn.gif';
 
   return `
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vérification Réussie • PrimeGen</title>
+  <title>Verification Successful • PrimeGen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -431,39 +431,39 @@ function buildSuccessPage(username, discriminator, avatar) {
       </div>
       
       <div class="brand-pill">✨ PrimeGen Verified</div>
-      <h1>Vérification Réussie !</h1>
-      <p class="subtitle">Compte Discord identifié et vérifié avec succès.</p>
+      <h1>Verification Successful!</h1>
+      <p class="subtitle">Discord account successfully identified and verified.</p>
       
       <div class="user-card">
         <span class="username-text">${username}</span>
-        <span class="discriminator-text">#${discriminator}</span>
+        <span class="discriminator-text">${discriminator === '0' ? '' : '#' + discriminator}</span>
       </div>
       
       <div class="benefits-grid">
         <div class="benefit-item">
           <span class="benefit-icon">👑</span>
-          <span>Role Vérifié attribué</span>
+          <span>Verified Role Assigned</span>
         </div>
         <div class="benefit-item">
           <span class="benefit-icon">🎁</span>
-          <span>Accès aux Générateurs</span>
+          <span>Access to Generators</span>
         </div>
         <div class="benefit-item">
           <span class="benefit-icon">⚡</span>
-          <span>Livraison Instantanée</span>
+          <span>Instant Delivery</span>
         </div>
         <div class="benefit-item">
           <span class="benefit-icon">💎</span>
-          <span>Services Prime</span>
+          <span>Prime Services</span>
         </div>
       </div>
       
       <a href="https://discord.gg/primegen" class="btn-discord">
-        🎮 Retourner sur Discord (.gg/primegen)
+        🎮 Return to Discord (.gg/primegen)
       </a>
       
       <div class="footer-note">
-        🔒 Vous pouvez fermer cette fenêtre en toute sécurité.
+        🔒 You can safely close this window.
       </div>
     </div>
   </div>
@@ -480,11 +480,11 @@ function buildErrorPage(message) {
 
   return `
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Erreur • PrimeGen</title>
+  <title>Error • PrimeGen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -572,9 +572,9 @@ function buildErrorPage(message) {
     </div>
     <div class="content">
       <div class="error-icon">✕</div>
-      <h1>Erreur de Vérification</h1>
+      <h1>Verification Error</h1>
       <p class="message">${message}</p>
-      <a href="/" class="btn-retry">🔄 Réessayer la vérification</a>
+      <a href="/" class="btn-retry">🔄 Retry Verification</a>
     </div>
   </div>
 </body>
