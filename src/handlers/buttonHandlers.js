@@ -22,9 +22,7 @@ async function handleButton(interaction) {
   try {
     if (customId.startsWith('gen_free_') || customId.startsWith('gen_premium_') || customId.startsWith('gen_prime_')) {
       await handleGenButton(interaction);
-    } else if (customId === 'lang_fr' || customId === 'lang_en') {
-      await handleLanguageSwitch(interaction);
-    } else if (customId === 'verify_user') {
+    }  else if (customId === 'verify_user') {
       await handleVerifyButton(interaction);
     } else if (customId === 'verify_manual') {
       await handleVerifyManual(interaction);
@@ -116,23 +114,11 @@ async function handleGenButton(interaction) {
 
   try {
     const remainingStock = Math.max(0, stock - 1);
-    const dmEmbed = buildFrenchGenEmbed(service.label, account.combo, account.account_info, remainingStock);
-
-    const languageRow = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId('lang_fr')
-        .setLabel('🇫🇷 Français')
-        .setStyle(ButtonStyle.Primary),
-      new ButtonBuilder()
-        .setCustomId('lang_en')
-        .setLabel('🇬🇧 English')
-        .setStyle(ButtonStyle.Secondary)
-    );
-
-    await interaction.user.send({ embeds: [dmEmbed], components: [languageRow] });
+    const dmEmbed = buildEnglishGenEmbed(service.label, account.combo, account.account_info, remainingStock);
+    await interaction.user.send({ embeds: [dmEmbed] });
 
     await interaction.editReply({
-      content: `${EMOJIS.SUCCESS} **${service.label}** envoyé en DM !\n${EMOJIS.INFO} Veuillez vérifier vos messages privés et choisir votre langue.`
+      content: `${EMOJIS.SUCCESS} **${service.label}** sent to your DMs!\n${EMOJIS.INFO} Please check your private messages.`
     });
 
     logger.info('Gen', `Account generated for ${interaction.user.tag}`, {
@@ -166,7 +152,7 @@ async function handleGenButton(interaction) {
     );
 
     await interaction.editReply({
-      content: `${EMOJIS.ERROR} Impossible de vous envoyer un MP !\n${EMOJIS.INFO} Vérifiez que vos messages privés sont bien ouverts.`
+      content: `${EMOJIS.ERROR} Could not send you a DM!\n${EMOJIS.INFO} Please check that your direct messages are open.`
     });
   }
 }
@@ -274,7 +260,7 @@ async function pingUserInProofChannel(guild, user, service) {
 
     if (proofChannel) {
       const pingMsg = await proofChannel.send(
-        `Hey ${user} ! 🎁 N'oublie pas de laisser ton avis / proof dans <#${REVIEW_CHANNEL_ID}> sous **24h** pour ta génération de **${service.label}** !\n⚠️ **Si tu ne le fais pas dans les 24h, tu recevras un avertissement.**`
+        `Hey ${user}! 🎁 Don't forget to leave your review / proof in <#${REVIEW_CHANNEL_ID}> within **24h** for your generation of **${service.label}**!\n⚠️ **If you don't do it within 24h, you will receive a warning.**`
       ).catch(() => null);
 
       if (pingMsg) {

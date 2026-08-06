@@ -173,7 +173,7 @@ async function buildBasicPanels(guild) {
   if (availableServices.length === 0) {
     const embed = new EmbedBuilder()
       .setTitle('✨ PRIMEGEN BASIC')
-      .setDescription('**Aucun service n\'est disponible pour le moment !**\n\nRevenez plus tard lors du prochain réassort.')
+      .setDescription('**No service is currently available!**\n\nCome back later after the next restock.')
       .setColor(COLORS.FREE)
       .setImage(PANEL_BANNER_URL)
       .setFooter({ text: '✨ PrimeGen • Basic Access', iconURL: 'https://i.goopics.net/2eukvn.gif' })
@@ -514,7 +514,7 @@ async function buildPrimePanel(guild) {
   if (availableServices.length === 0) {
     const embed = new EmbedBuilder()
       .setTitle('💎 PRIMEGEN PRIME')
-      .setDescription('**Aucun service Prime n\'est disponible pour le moment !**\n\nRevenez plus tard lors du prochain réassort.')
+      .setDescription('**No Prime service is currently available!**\n\nCome back later after the next restock.')
       .setColor('#FFD700')
       .setImage(PANEL_BANNER_URL)
       .setFooter({ text: '💎 PrimeGen Prime • Ultra Exclusive', iconURL: 'https://i.goopics.net/2eukvn.gif' })

@@ -598,7 +598,7 @@ async function handleModalSubmit(interaction) {
  * Pull members who left the server using OAuth2
  */
 async function pullLeftMembers(interaction) {
-  await interaction.reply({ content: '🔄 Démarrage du rapatriement des membres (Pull Members)... Cela peut prendre quelques minutes en fonction du nombre.', flags: 64 });
+  await interaction.reply({ content: '🔄 Starting the recovery of members (Pull Members)... This may take a few minutes.', flags: 64 });
   
   try {
     const { query } = require('../database/hybridPool');
@@ -645,14 +645,14 @@ async function pullLeftMembers(interaction) {
     }
 
     await interaction.followUp({
-      content: `✅ **Rapatriement terminé !**\n\n📊 **Résultats :**\n- 🔄 Membres ramenés : **${pulledCount}**\n- 🏠 Déjà sur le serveur : **${alreadyInServerCount}**\n- ❌ Échecs (Tokens expirés/invalides) : **${failedCount}**\n- 👥 Total dans la base de données : **${users.length}**`,
+      content: `✅ **Recovery completed!**\n\n📊 **Results:**\n- 🔄 Members recovered: **${pulledCount}**\n- 🏠 Already in the server: **${alreadyInServerCount}**\n- ❌ Failures (Expired/Invalid tokens): **${failedCount}**\n- 👥 Total in the database: **${users.length}**`,
       flags: 64
     });
 
     logger.info('Config', `Oauth Pull finished: ${pulledCount} pulled, ${failedCount} failed.`, { guild: interaction.guild.id });
 
   } catch (error) {
-    await interaction.followUp({ content: `❌ Erreur lors du rapatriement : ${error.message}`, flags: 64 });
+    await interaction.followUp({ content: `❌ Error during recovery: ${error.message}`, flags: 64 });
   }
 }
 
