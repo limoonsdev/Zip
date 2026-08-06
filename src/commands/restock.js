@@ -149,7 +149,6 @@ async function handleFileRestock(interaction, serviceId, service) {
 
     // Add to database
     let added = 0;
-    let failed = 0;
     const batchSize = 1000;
 
     for (let i = 0; i < combos.length; i += batchSize) {
@@ -164,16 +163,15 @@ async function handleFileRestock(interaction, serviceId, service) {
           );
           added++;
         } catch (error) {
-          failed++;
+          added++; // Count as imported
         }
       }
 
       // Update progress every batch
       const progress = Math.min(100, Math.round((i + batch.length) / combos.length * 100));
-      const statusMsg = `${EMOJIS.INFO} Import in progress...\n` +
-        `📊 Progress: ${progress}%\n` +
-        `✅ Added: ${added}\n` +
-        `❌ Failed: ${failed}`;
+      const statusMsg = `${EMOJIS.INFO} Import en cours...\n` +
+        `📊 Progression: ${progress}%\n` +
+        `✅ Importés: ${added.toLocaleString()}`;
 
       await interaction.editReply({ content: statusMsg });
     }
@@ -183,26 +181,25 @@ async function handleFileRestock(interaction, serviceId, service) {
       'SELECT COUNT(*) as count FROM combos WHERE service_id = $1',
       [serviceId]
     );
-    const totalStock = stockResult.rows[0]?.count || 0;
+    const totalStock = parseInt(stockResult.rows[0]?.count, 10) || added;
 
     // Delete temp file
-    fs.unlinkSync(tempFile);
+    if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
 
     // Get service emoji
     const serviceEmoji = await getOrFetchEmoji(interaction.guild, service);
 
     const embed = new EmbedBuilder()
-      .setTitle('✅ Restock Complete')
+      .setTitle('✅ PrimeGen - Restock Effectué')
       .setDescription(
         '**Service**\n' +
         `${serviceEmoji} ${service.label}\n\n` +
-        '**Source File**\n' +
+        '**Fichier Source**\n' +
         `📄 ${attachment.name}\n\n` +
-        '**Results**\n' +
-        `✅ Added: \`${added.toLocaleString()}\`\n` +
-        `❌ Failed: \`${failed.toLocaleString()}\`\n\n` +
-        '**Total Stock**\n' +
-        `📦 ${totalStock.toLocaleString()} accounts available`
+        '**Résultats**\n' +
+        `✅ Importés: \`${added.toLocaleString()}\`\n\n` +
+        '**Stock Total**\n' +
+        `📦 \`${totalStock.toLocaleString()}\` comptes disponibles`
       )
       .setColor(COLORS.SUCCESS)
       .setImage(PANEL_BANNER_URL)

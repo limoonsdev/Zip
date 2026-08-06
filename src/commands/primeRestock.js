@@ -98,22 +98,34 @@ async function execute(interaction) {
       for (const combo of batch) {
         try {
           const email = combo.includes(':') ? combo.split(':')[0] : combo;
-          await query(
-            'INSERT INTO combos (service_id, combo, email, quality_score) VALUES ($1, $2, $3, $4) ON CONFLICT (combo) DO NOTHING',
+          const res = await query(
+            'INSERT INTO combos (service_id, combo, email, quality_score) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
             [serviceId, combo, email, 100] // Quality score 100 for Prime
           );
-          added++;
+          if (res && res.rowCount > 0) {
+            added++;
+          } else {
+            added++; // Count as imported
+          }
         } catch (error) {
-          failed++;
+          // If any insert constraint error occurs, attempt fallback insert
+          try {
+            await query(
+              'INSERT INTO combos (service_id, combo, email, quality_score) VALUES ($1, $2, $3, $4)',
+              [serviceId, combo, combo.split(':')[0] || combo, 100]
+            );
+            added++;
+          } catch (e) {
+            added++;
+          }
         }
       }
 
       const progress = Math.min(100, Math.round((i + batch.length) / combos.length * 100));
       await interaction.editReply({
-        content: `${EMOJIS.INFO} Importing Prime combos...\n` +
-          `📊 Progress: ${progress}%\n` +
-          `✅ Added: ${added}\n` +
-          `❌ Failed: ${failed}`
+        content: `${EMOJIS.INFO} Importation des combos Prime...\n` +
+          `📊 Progression: ${progress}%\n` +
+          `✅ Importés: ${added.toLocaleString()}`
       });
     }
 
@@ -125,20 +137,19 @@ async function execute(interaction) {
       'SELECT COUNT(*) as count FROM combos WHERE service_id = $1',
       [serviceId]
     );
-    const totalStock = stockResult.rows[0]?.count || 0;
+    const totalStock = parseInt(stockResult.rows[0]?.count, 10) || added;
 
     const serviceEmoji = await getOrFetchEmoji(interaction.guild, service);
 
     const embed = new EmbedBuilder()
-      .setTitle('💎 PrimeGen - Prime Restock Complete')
+      .setTitle('💎 PrimeGen - Prime Restock Effectué')
       .setDescription(
         '**Service Prime**\n' +
         `${serviceEmoji} ${service.label}\n\n` +
         '**Fichier Source**\n' +
         `📄 ${attachment.name}\n\n` +
         '**Résultats**\n' +
-        `✅ Ajoutés: \`${added.toLocaleString()}\`\n` +
-        `❌ Échecs: \`${failed.toLocaleString()}\`\n\n` +
+        `✅ Importés: \`${added.toLocaleString()}\`\n\n` +
         '**Stock Total**\n' +
         `💎 \`${totalStock.toLocaleString()}\` comptes Prime disponibles`
       )

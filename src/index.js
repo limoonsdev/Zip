@@ -175,22 +175,6 @@ class NextGenBot {
     registerModalHandlers(this.client);
     registerInviteHandlers(this.client);
 
-    // Autocomplete handling
-    this.client.on('interactionCreate', async (interaction) => {
-      if (!interaction.isAutocomplete()) return;
-
-      const command = this.commands.get(interaction.commandName);
-      if (!command?.autocomplete) return;
-
-      try {
-        await command.autocomplete(interaction);
-      } catch (error) {
-        logger.error('Bot', `Autocomplete error for ${interaction.commandName}`, {
-          error: error.message
-        });
-      }
-    });
-
     // Error handling
     this.client.on('error', (error) => {
       logger.error('Bot', 'Client error', { error: error.message });
