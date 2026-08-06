@@ -274,7 +274,7 @@ async function pingUserInProofChannel(guild, user, service) {
 
     if (proofChannel) {
       const pingMsg = await proofChannel.send(
-        `Hey ${user}! 🎁 Don't forget to leave your review / proof in <#${REVIEW_CHANNEL_ID}> within **24h** for your generation of **${service.label}**!\n⚠️ **If you don't do it within 24h, you will receive a warning.**`
+        `Hey ${user}! 🎁 Don't forget to leave your review / proof in <#${REVIEW_CHANNEL_ID}> within **24h** for your generation of **${service.label}**!\n⚠️ **If you don't do it within 24h, you will receive a warning.**\n\n🇫🇷 N'oublie pas de laisser ton avis / proof sous **24h** !\n⚠️ **En cas de non-respect, tu recevras un avertissement.**`
       ).catch(() => null);
 
       if (pingMsg) {
