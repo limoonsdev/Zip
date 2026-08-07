@@ -90,6 +90,13 @@ async function handleGenButton(interaction) {
     });
   }
 
+  // Check Free role if tier is free
+  if (tier === 'free' && !interaction.member.roles.cache.has('1532347064623698010')) {
+    return interaction.editReply({
+      content: '❌ Tu n\'as pas accès à ce panel ! Vérifie-toi d\'abord pour obtenir le rôle Free.'
+    });
+  }
+
   // Cooldown Check
   if (interaction.guild) {
     const config = await getOrCreateGuildConfig(interaction.guild.id);
