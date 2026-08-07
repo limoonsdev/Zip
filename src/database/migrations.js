@@ -56,6 +56,12 @@ async function createCombosTable() {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  try {
+    await query("ALTER TABLE combos ADD COLUMN email VARCHAR(255) DEFAULT ''");
+  } catch (e) {
+    // Column may already exist
+  }
 }
 
 /**
