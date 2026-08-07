@@ -9,8 +9,12 @@ const { EMOJIS } = require('../config/constants');
 const { getServiceById } = require('../config/services');
 const { query } = require('../database/hybridPool');
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
+const { getOrCreateGuildConfig } = require('../database/models');
+const { formatTime } = require('../utils/timeParser');
 
 const logger = getLogger();
+const userCooldowns = new Map(); // Store cooldowns: userCooldowns.get(userId) = { free: timestamp, premium: timestamp }
+
 
 function registerButtonHandlers(client) {
   logger.info('ButtonHandlers', 'Button handlers registered');
@@ -76,12 +80,37 @@ async function handleGenButton(interaction) {
   const parts = interaction.customId.split('_');
   const tier = parts[1];
   const serviceId = parts.slice(2).join('_');
+  const userId = interaction.user.id;
+  const now = Date.now();
 
   // Check Premium role if tier is premium
   if (tier === 'premium' && !interaction.member.roles.cache.has('1532346926425444474')) {
     return interaction.editReply({
       content: '🖕 Va te faire foutre, t\'as pas le rôle Premium ! Achète-le sur le shop avant de cliquer ici.'
     });
+  }
+
+  // Cooldown Check
+  if (interaction.guild) {
+    const config = await getOrCreateGuildConfig(interaction.guild.id);
+    const confData = config.config_data || {};
+    const cdFree = confData.cooldown_free ?? 600000;
+    const cdPremium = confData.cooldown_premium ?? 60000;
+    
+    let userCd = userCooldowns.get(userId) || { free: 0, premium: 0 };
+    let nextAllowed = tier === 'premium' ? userCd.premium : (tier === 'free' ? userCd.free : 0);
+    
+    if (now < nextAllowed) {
+      const remainingMs = nextAllowed - now;
+      return interaction.editReply({
+        content: `${EMOJIS.COOLDOWN} **Cooldown !** Tu dois attendre encore **${formatTime(remainingMs)}** avant de générer sur ce panel.`
+      });
+    }
+
+    // Set new cooldown based on tier
+    if (tier === 'free') userCd.free = now + cdFree;
+    else if (tier === 'premium') userCd.premium = now + cdPremium;
+    userCooldowns.set(userId, userCd);
   }
 
   const service = getServiceById(serviceId);
