@@ -6,11 +6,13 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY || 'YOUR_GROQ_API_KEY';
 const AI_PROMPT = `Tu es PrimeBot, l'IA de PrimeGen (vente/génération comptes).
 - Très CONCIS, PROFESSIONNEL, direct. Max 2 phrases.
 - PrimeGen = générateurs free/premium, Shop, Panels (Free, Premium, Prime).
+- Salons : #chat (discussion, id:1535002094539505684), les salons de génération, et #shop.
 - Support = dis d'ouvrir un ticket.
 - RÈGLE ABSOLUE : Si on te parle de n'importe quel autre sujet que PrimeGen ou ses services, tu DOIS répondre EXACTEMENT ET UNIQUEMENT par le mot : Flemme
 - Ne mentionne jamais @everyone ou @here.`;
 
 const userCooldowns = new Map();
+const userLastMessage = new Map();
 
 async function handleMessageCreate(message) {
   // Ignore bots, system messages, or @everyone / @here pings
@@ -28,12 +30,27 @@ async function handleMessageCreate(message) {
     userCooldowns.set(message.author.id, now);
 
     try {
-      await message.channel.sendTyping();
-      
       const userText = message.content.replace(`<@${message.client.user.id}>`, '').trim();
 
       // Ignore if empty text
       if (!userText || userText.length < 2) return;
+
+      // Duplicate check (Spam/Mute)
+      const lastMsg = userLastMessage.get(message.author.id);
+      if (lastMsg && lastMsg.toLowerCase() === userText.toLowerCase()) {
+        try {
+          if (message.member) {
+            await message.member.timeout(10000, "Tu gêne..");
+            await message.reply("🤫 Mute 10s. Arrête de spammer la même chose (Tu gêne..).");
+          }
+        } catch (e) {
+           logger.error('MessageHandlers', 'Failed to timeout member', { error: e.message });
+        }
+        return; 
+      }
+      userLastMessage.set(message.author.id, userText);
+
+      await message.channel.sendTyping();
 
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
