@@ -207,7 +207,7 @@ function buildFrenchGenEmbed(serviceLabel, combo, accountInfo, remainingStock) {
     .setDescription(
       `**Service :** \`${serviceLabel}\`\n\n` +
       '**Compte :**\n' +
-      `\`\`\`\n${combo}\n\`\`\`\n` +
+      `\`${combo}\`\n\n` +
       (accountInfo ? `ℹ️ **Information :** ${accountInfo}\n\n` : '') +
       '💡 **Conseils importants :**\n' +
       '• Changez le mot de passe immédiatement si possible.\n' +
@@ -230,7 +230,7 @@ function buildEnglishGenEmbed(serviceLabel, combo, accountInfo, remainingStock) 
     .setDescription(
       `**Service:** \`${serviceLabel}\`\n\n` +
       '**Account:**\n' +
-      `\`\`\`\n${combo}\n\`\`\`\n` +
+      `\`${combo}\`\n\n` +
       (accountInfo ? `ℹ️ **Information:** ${accountInfo}\n\n` : '') +
       '💡 **Important Tips:**\n' +
       '• Change the password immediately if possible.\n' +
