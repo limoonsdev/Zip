@@ -31,6 +31,18 @@ function registerSelectHandlers(client) {
     }
   });
 
+  // Config role cooldown select handler
+  client.selectHandlers.set('config_cooldown_role_select', async (interaction) => {
+    try {
+      if (interaction.values && interaction.values.length > 0) {
+        const { showCustomRoleCooldownModal } = require('../commands/config');
+        await showCustomRoleCooldownModal(interaction, interaction.values[0]);
+      }
+    } catch (error) {
+      logger.error('SelectHandlers', 'Role CD selection failed', { error: error.message });
+    }
+  });
+
   // Shop package select handler
   client.selectHandlers.set('shop_package_select', async (interaction) => {
     try {

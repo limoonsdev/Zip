@@ -179,6 +179,21 @@ async function handleCategorySelection(interaction) {
  * Show cooldowns configuration
  */
 async function showCooldownsConfig(interaction) {
+  const { getOrCreateGuildConfig } = require('../database/models');
+  const { formatTime } = require('../utils/timeParser');
+  
+  const config = await getOrCreateGuildConfig(interaction.guild.id);
+  const confData = config.config_data || {};
+  
+  let rolesText = '';
+  if (confData.cooldown_roles && Object.keys(confData.cooldown_roles).length > 0) {
+    for (const [roleId, time] of Object.entries(confData.cooldown_roles)) {
+      rolesText += `• <@&${roleId}> : **${formatTime(time)}**\n`;
+    }
+  } else {
+    rolesText = 'No custom rules.\nSelect a role below to add one.';
+  }
+
   const embed = new EmbedBuilder()
     .setColor(0x5865F2)
     .setTitle('⏱️ Cooldown Configuration')
@@ -193,23 +208,41 @@ async function showCooldownsConfig(interaction) {
     .addFields(
       {
         name: 'Current Settings',
-        value: 'Click a button below to change cooldown',
+        value: `Free: **${formatTime(confData.cooldown_free ?? 600000)}**\nPremium: **${formatTime(confData.cooldown_premium ?? 60000)}**`,
+        inline: false
+      },
+      {
+        name: 'Custom Roles',
+        value: rolesText,
         inline: false
       }
+    );
+
+  const { RoleSelectMenuBuilder } = require('discord.js');
+  const roleRow = new ActionRowBuilder()
+    .addComponents(
+      new RoleSelectMenuBuilder()
+        .setCustomId('config_cooldown_role_select')
+        .setPlaceholder('Select a role to add/edit a custom cooldown')
     );
 
   const row = new ActionRowBuilder()
     .addComponents(
       new ButtonBuilder()
         .setCustomId('config_cooldown_free')
-        .setLabel('Free Cooldown')
+        .setLabel('Free')
         .setStyle(ButtonStyle.Secondary)
         .setEmoji('🆓'),
       new ButtonBuilder()
         .setCustomId('config_cooldown_premium')
-        .setLabel('Premium Cooldown')
+        .setLabel('Premium')
         .setStyle(ButtonStyle.Primary)
         .setEmoji('👑'),
+      new ButtonBuilder()
+        .setCustomId('config_cooldown_clear')
+        .setLabel('Clear Rules')
+        .setStyle(ButtonStyle.Secondary)
+        .setEmoji('🗑️'),
       new ButtonBuilder()
         .setCustomId('config_back')
         .setLabel('Back')
@@ -217,7 +250,11 @@ async function showCooldownsConfig(interaction) {
         .setEmoji('◀️')
     );
 
-  await interaction.update({ embeds: [embed], components: [row] });
+  if (interaction.isMessageComponent()) {
+    await interaction.update({ embeds: [embed], components: [roleRow, row] });
+  } else {
+    await interaction.editReply({ embeds: [embed], components: [roleRow, row] });
+  }
 }
 
 /**
@@ -664,6 +701,12 @@ async function handleConfigButton(interaction) {
   
   if (customId === 'config_cooldown_free') return await showCooldownModal(interaction, 'free');
   if (customId === 'config_cooldown_premium') return await showCooldownModal(interaction, 'premium');
+  if (customId === 'config_cooldown_clear') {
+    const { updateGuildConfig } = require('../database/models');
+    await updateGuildConfig(interaction.guild.id, { cooldown_roles: {} });
+    await interaction.reply({ content: '✅ All custom role cooldowns cleared.', ephemeral: true });
+    return;
+  }
   if (customId === 'config_limit_free') return await showLimitModal(interaction, 'free');
   if (customId === 'config_limit_premium') return await showLimitModal(interaction, 'premium');
   if (customId === 'config_role_free') return await showRoleModal(interaction, 'free');
@@ -681,12 +724,30 @@ async function handleConfigButton(interaction) {
   await interaction.reply({ content: '⚙️ This setting is coming soon or handled elsewhere.', ephemeral: true });
 }
 
+
+async function showCustomRoleCooldownModal(interaction, roleId) {
+  const modal = new ModalBuilder()
+    .setCustomId(`config_modal_cd_role_${roleId}`)
+    .setTitle('Custom Cooldown (Role)');
+
+  const input = new TextInputBuilder()
+    .setCustomId('cooldown_value')
+    .setLabel('Cooldown Duration (e.g. 5m, 0 for none)')
+    .setStyle(TextInputStyle.Short)
+    .setPlaceholder('5m')
+    .setRequired(true);
+
+  modal.addComponents(new ActionRowBuilder().addComponents(input));
+  await interaction.showModal(modal);
+}
+
 module.exports = {
   command,
   execute,
   showConfigMenu,
   handleCategorySelection,
   showCooldownModal,
+  showCustomRoleCooldownModal,
   showLimitModal,
   showRoleModal,
   showChannelModal,

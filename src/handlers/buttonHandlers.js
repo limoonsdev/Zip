@@ -101,8 +101,22 @@ async function handleGenButton(interaction) {
   if (interaction.guild) {
     const config = await getOrCreateGuildConfig(interaction.guild.id);
     const confData = config.config_data || {};
-    const cdFree = confData.cooldown_free ?? 600000;
-    const cdPremium = confData.cooldown_premium ?? 60000;
+    let cdFree = confData.cooldown_free ?? 600000;
+    let cdPremium = confData.cooldown_premium ?? 60000;
+
+    // Apply custom role cooldowns
+    if (confData.cooldown_roles && Object.keys(confData.cooldown_roles).length > 0) {
+      let lowestCustomCd = Infinity;
+      for (const [roleId, time] of Object.entries(confData.cooldown_roles)) {
+        if (interaction.member.roles.cache.has(roleId)) {
+          if (time < lowestCustomCd) lowestCustomCd = time;
+        }
+      }
+      if (lowestCustomCd !== Infinity) {
+        cdFree = lowestCustomCd;
+        cdPremium = lowestCustomCd;
+      }
+    }
     
     let userCd = userCooldowns.get(userId) || { free: 0, premium: 0 };
     let nextAllowed = (tier === 'premium' || tier === 'prime') ? userCd.premium : (tier === 'free' ? userCd.free : 0);
