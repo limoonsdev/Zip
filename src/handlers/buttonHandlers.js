@@ -98,7 +98,7 @@ async function handleGenButton(interaction) {
     const cdPremium = confData.cooldown_premium ?? 60000;
     
     let userCd = userCooldowns.get(userId) || { free: 0, premium: 0 };
-    let nextAllowed = tier === 'premium' ? userCd.premium : (tier === 'free' ? userCd.free : 0);
+    let nextAllowed = (tier === 'premium' || tier === 'prime') ? userCd.premium : (tier === 'free' ? userCd.free : 0);
     
     if (now < nextAllowed) {
       const remainingMs = nextAllowed - now;
@@ -109,7 +109,7 @@ async function handleGenButton(interaction) {
 
     // Set new cooldown based on tier
     if (tier === 'free') userCd.free = now + cdFree;
-    else if (tier === 'premium') userCd.premium = now + cdPremium;
+    else if (tier === 'premium' || tier === 'prime') userCd.premium = now + cdPremium;
     userCooldowns.set(userId, userCd);
   }
 
