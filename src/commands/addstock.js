@@ -130,11 +130,13 @@ async function execute(interaction) {
       for (const combo of batch) {
         try {
           const email = combo.includes(':') ? combo.split(':')[0] : combo;
-          await query(
+          const res = await query(
             'INSERT INTO combos (service_id, combo, email, quality_score) VALUES ($1, $2, $3, $4) ON CONFLICT (combo) DO NOTHING',
             [serviceId, combo, email, qualityScore]
           );
-          added++;
+          if (res && res.rowCount > 0) {
+            added++;
+          }
         } catch (error) {
           try {
             await query(
@@ -142,7 +144,12 @@ async function execute(interaction) {
               [serviceId, combo, combo, qualityScore]
             );
             added++;
-          } catch(e) {}
+          } catch(e) {
+            // Uniquement log si l'erreur n'est pas "UNIQUE constraint failed"
+            if (!e.message.includes('UNIQUE constraint') && !e.message.includes('duplicate key')) {
+               logger.warn('AddStock', `Insert error: ${e.message}`);
+            }
+          }
         }
       }
 
