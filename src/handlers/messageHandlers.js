@@ -3,26 +3,40 @@ const logger = getLogger();
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY || 'YOUR_GROQ_API_KEY';
 
-const AI_PROMPT = `Tu es l'assistant IA de PrimeGen, un serveur Discord dédié à la vente et génération de comptes (Fortnite, Netflix, Spotify, etc.).
-Ton rôle est de répondre aux questions des membres, les orienter et les aider.
-Voici les informations du serveur:
+const AI_PROMPT = `Tu es PrimeBot, l'assistant IA de PrimeGen, un serveur Discord dédié à la vente et génération de comptes (Fortnite, Netflix, Spotify, etc.).
+Ton rôle est d'aider les membres.
+- Sois très PROFESSIONNEL, CLAIR et CONCIS. Fais des phrases courtes et directes. Pas de longs paragraphes.
 - PrimeGen propose des générateurs gratuits et premiums.
 - Shop : Les membres peuvent acheter du premium ou des services via le salon Shop ou les admins.
-- Panels : Il y a un panel Free (gratuit), un panel Premium (payant, avec moins de cooldown), et un panel Prime (très haute qualité).
-- Cooldowns : Les utilisateurs normaux ont un temps d'attente entre chaque génération, les premiums ont un temps réduit.
+- Panels : Il y a un panel Free (gratuit), un panel Premium (payant, cooldown très court), et un panel Prime (très haute qualité).
 - Support : En cas de problème de paiement ou question complexe, dis-leur d'ouvrir un ticket.
-- Tu dois être courtois, dynamique, utiliser des emojis et répondre principalement en français (ou dans la langue de l'utilisateur).
-- Ton modèle sous-jacent est LLaMA-3.3-70b-versatile, mais tu es "PrimeBot".`;
+- Tu ne dois JAMAIS mentionner @everyone ou @here.
+- Tu réponds principalement en français, de manière experte.`;
+
+const userCooldowns = new Map();
 
 async function handleMessageCreate(message) {
-  if (message.author.bot) return;
+  // Ignore bots, system messages, or @everyone / @here pings
+  if (message.author.bot || message.mentions.everyone) return;
 
-  // Only reply if the bot is mentioned
+  // Only reply if the bot is directly mentioned
   if (message.mentions.has(message.client.user)) {
+    
+    // Anti-spam cooldown (5 seconds per user)
+    const now = Date.now();
+    if (userCooldowns.has(message.author.id)) {
+      const lastTime = userCooldowns.get(message.author.id);
+      if (now - lastTime < 5000) return; 
+    }
+    userCooldowns.set(message.author.id, now);
+
     try {
       await message.channel.sendTyping();
       
       const userText = message.content.replace(`<@${message.client.user.id}>`, '').trim();
+
+      // Ignore if empty text
+      if (!userText || userText.length < 2) return;
 
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
@@ -34,10 +48,10 @@ async function handleMessageCreate(message) {
           model: 'llama-3.3-70b-versatile',
           messages: [
             { role: 'system', content: AI_PROMPT },
-            { role: 'user', content: userText || 'Bonjour !' }
+            { role: 'user', content: userText }
           ],
-          max_tokens: 500,
-          temperature: 0.7
+          max_tokens: 300,
+          temperature: 0.5
         })
       });
 
@@ -51,7 +65,7 @@ async function handleMessageCreate(message) {
       await message.reply(reply);
     } catch (error) {
       logger.error('MessageHandlers', 'AI response failed', { error: error.message });
-      await message.reply("Désolé, je suis un peu surchargé pour le moment ! Réessaie plus tard. 🤖");
+      // On spam/error silently drop to avoid spamming the chat
     }
   }
 }
