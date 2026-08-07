@@ -92,8 +92,23 @@ function registerPanel(messageIdInput, channelId, guildId, type, client) {
     clearInterval(activePanels.get(groupId).interval);
   }
 
+  const panelData = {
+    channelId,
+    guildId,
+    type,
+    isUpdating: false,
+    interval: null
+  };
+  activePanels.set(groupId, panelData);
+
   // Create update interval (5 seconds)
-  const interval = setInterval(async () => {
+  panelData.interval = setInterval(async () => {
+    if (panelData.isUpdating) {
+      logger.debug('PanelManager', `Skipping update for ${groupId}, previous update still in progress.`);
+      return;
+    }
+
+    panelData.isUpdating = true;
     try {
       const guild = await client.guilds.fetch(guildId);
       const channel = await guild.channels.fetch(channelId);
@@ -137,15 +152,10 @@ function registerPanel(messageIdInput, channelId, guildId, type, client) {
       logger.debug('PanelManager', `Updated ${type} panel group`, { groupId });
     } catch (error) {
       logger.error('PanelManager', `Failed to update panel group ${groupId}`, { error: error.message });
+    } finally {
+      panelData.isUpdating = false;
     }
   }, 5000); // 5 seconds
-
-  activePanels.set(groupId, {
-    channelId,
-    guildId,
-    type,
-    interval
-  });
 
   logger.info('PanelManager', `Registered ${type} panel group for auto-update`, { groupId });
 }
