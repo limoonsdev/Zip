@@ -31,7 +31,8 @@ const command = new SlashCommandBuilder()
         { name: '📊 Status Panel', value: 'status' },
         { name: '📦 Stock Panel', value: 'stock' },
         { name: '❓ FAQ Panel', value: 'faq' },
-        { name: '🛒 Shop Panel', value: 'shop' }
+        { name: '🛒 Shop Panel', value: 'shop' },
+        { name: '👑 VIP Price Panel', value: 'vip_price' }
       ))
   .addChannelOption(option =>
     option.setName('channel')
@@ -89,6 +90,10 @@ async function execute(interaction) {
     }
     case 'shop': {
       panelsToDeploy.push(await buildShopPanel(interaction.guild));
+      break;
+    }
+    case 'vip_price': {
+      panelsToDeploy.push(await buildVipPricePanel(interaction.guild));
       break;
     }
     }
@@ -707,4 +712,51 @@ async function buildPrimeStockPanel(guild) {
   return { embed, components: [] };
 }
 
-module.exports = { command, execute, buildBasicPanels, buildPrimePanel, buildPrimeStockPanel, buildStockPanel, buildFAQPanel, buildShopPanel };
+/**
+ * Build VIP Price Panel
+ */
+async function buildVipPricePanel(guild) {
+  // Try to find custom emojis for decoration
+  const vipEmoji = guild ? guild.emojis.cache.find(e => e.name.toLowerCase().includes('vip') || e.name.toLowerCase().includes('premium')) || '👑' : '👑';
+  const checkEmoji = guild ? guild.emojis.cache.find(e => e.name.toLowerCase().includes('check') || e.name.toLowerCase().includes('yes')) || '✅' : '✅';
+  const moneyEmoji = guild ? guild.emojis.cache.find(e => e.name.toLowerCase().includes('money') || e.name.toLowerCase().includes('coin') || e.name.toLowerCase().includes('paypal')) || '💰' : '💰';
+  const starEmoji = guild ? guild.emojis.cache.find(e => e.name.toLowerCase().includes('star')) || '✨' : '✨';
+  const flashEmoji = guild ? guild.emojis.cache.find(e => e.name.toLowerCase().includes('flash') || e.name.toLowerCase().includes('zap')) || '⚡' : '⚡';
+
+  const embed = new EmbedBuilder()
+    .setTitle(`${vipEmoji} PRIMEGEN V.I.P - THE ULTIMATE EXPERIENCE`)
+    .setDescription(
+      `**Upgrade to V.I.P and unlock the full potential of PrimeGen!** ${starEmoji}\n\n` +
+      `### ${flashEmoji} EXCLUSIVE ADVANTAGES:\n` +
+      `> ${checkEmoji} **Zero Cooldown:** Generate without waiting (or highly reduced limits).\n` +
+      `> ${checkEmoji} **Prime Access:** Access to the ultra-exclusive **💎 Prime** generators.\n` +
+      `> ${checkEmoji} **Huge Daily Limits:** Generate up to 50 accounts per day!\n` +
+      `> ${checkEmoji} **Priority Support:** Your tickets are answered first.\n` +
+      `> ${checkEmoji} **High Quality:** Guaranteed working and high-level accounts.\n` +
+      `> ${checkEmoji} **Private Channels:** Access to the secret VIP Lounge and restock leaks.\n\n` +
+      `### ${moneyEmoji} VIP PRICING:\n` +
+      `> **1 Week V.I.P** ➔ \`$3.99\` / \`3.99€\`\n` +
+      `> **1 Month V.I.P** ➔ \`$9.99\` / \`9.99€\` (Best Value 🔥)\n` +
+      `> **Lifetime V.I.P** ➔ \`$39.99\` / \`39.99€\`\n\n` +
+      `**How to purchase?**\n` +
+      `Click the button below to open a ticket and complete your purchase! We accept PayPal, Crypto, and Giftcards.`
+    )
+    .setColor('#FF00FF') // VIP Pink/Purple color
+    .setImage(PANEL_BANNER_URL)
+    .setFooter({ 
+      text: '👑 PrimeGen V.I.P • Elevate your experience',
+      iconURL: 'https://i.goopics.net/2eukvn.gif'
+    })
+    .setTimestamp();
+
+  const button = new ButtonBuilder()
+    .setCustomId('ticket_create')
+    .setLabel('💎 Purchase V.I.P')
+    .setStyle(ButtonStyle.Primary);
+
+  const row = new ActionRowBuilder().addComponents(button);
+
+  return { embeds: [embed], components: [row] };
+}
+
+module.exports = { command, execute, buildBasicPanels, buildPrimePanel, buildPrimeStockPanel, buildStockPanel, buildFAQPanel, buildShopPanel, buildVipPricePanel };
