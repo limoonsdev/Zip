@@ -620,6 +620,36 @@ async function handleModalSubmit(interaction) {
     
     await updateGuildConfig(interaction.guild.id, { [key]: value });
     await interaction.reply({ content: '✅ Role set successfully!', ephemeral: true });
+  } else if (type === 'cd' && tier === 'role') {
+    const roleId = interaction.customId.split('_')[4];
+    const value = interaction.fields.getTextInputValue('cooldown_value');
+    const { parseTime, formatTime } = require('../utils/timeParser');
+    const ms = parseTime(value);
+
+    if (ms === null) {
+      return await interaction.reply({
+        content: '❌ Invalid time format. Use: 30s, 1m, 1h, etc.',
+        ephemeral: true
+      });
+    }
+
+    const { getOrCreateGuildConfig } = require('../database/models');
+    const existing = await getOrCreateGuildConfig(interaction.guild.id);
+    const confData = existing.config_data || {};
+    const cdRoles = confData.cooldown_roles || {};
+    
+    if (ms === 0) {
+      delete cdRoles[roleId];
+    } else {
+      cdRoles[roleId] = ms;
+    }
+
+    await updateGuildConfig(interaction.guild.id, { cooldown_roles: cdRoles });
+    
+    await interaction.reply({
+      content: ms === 0 ? `✅ Custom cooldown removed for <@&${roleId}>` : `✅ Custom cooldown for <@&${roleId}> set to **${formatTime(ms)}**`,
+      ephemeral: true
+    });
   } else if (type === 'channel') {
     const value = interaction.fields.getTextInputValue('channel_id_value');
     if (!/^\d{17,20}$/.test(value)) {
