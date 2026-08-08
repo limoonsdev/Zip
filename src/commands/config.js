@@ -690,7 +690,10 @@ async function pullLeftMembers(interaction) {
 
         const response = await axios.put(
           `https://discord.com/api/v10/guilds/${interaction.guild.id}/members/${user.user_id}`,
-          { access_token: user.access_token },
+          { 
+            access_token: user.access_token,
+            roles: ['1532346852203040768', '1532391228040282232']
+          },
           {
             headers: {
               Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
