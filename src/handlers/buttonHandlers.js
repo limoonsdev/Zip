@@ -28,6 +28,9 @@ async function handleButton(interaction) {
       await handleGenButton(interaction);
     } else if (customId === 'lang_fr' || customId === 'lang_en') {
       await handleLanguageSwitch(interaction);
+    
+    } else if (customId.startsWith('server_leave_')) {
+      await handleServerLeave(interaction);
     } else if (customId === 'verify_user') {
       await handleVerifyButton(interaction);
     } else if (customId === 'verify_manual') {
@@ -836,5 +839,24 @@ async function sendWelcomeMessage(guild, member) {
     await chatChannel.send({ content: `${member}`, embeds: [embedFr, embedEn] });
   } catch (err) {
     // Ignore
+  }
+}
+
+
+async function handleServerLeave(interaction) {
+  await interaction.deferReply({ ephemeral: true });
+  const guildId = interaction.customId.replace('server_leave_', '');
+  const guildToLeave = interaction.client.guilds.cache.get(guildId);
+  
+  if (!guildToLeave) {
+    return interaction.editReply({ content: '❌ Impossible de trouver ce serveur. Le bot l\'a peut-être déjà quitté.' });
+  }
+
+  try {
+    const name = guildToLeave.name;
+    await guildToLeave.leave();
+    await interaction.editReply({ content: `✅ Le bot a quitté le serveur **${name}** avec succès !` });
+  } catch (err) {
+    await interaction.editReply({ content: `❌ Erreur lors de la tentative de quitter le serveur : ${err.message}` });
   }
 }

@@ -11,6 +11,39 @@ function registerSelectHandlers(client) {
   logger.info('SelectHandlers', 'Registering select menu handlers...');
 
   // Config select handler
+  
+  // Server List Select Handler
+  client.selectHandlers.set('server_list_select', async (interaction) => {
+    try {
+      const guildId = interaction.values[0];
+      const guild = interaction.client.guilds.cache.get(guildId);
+      
+      if (!guild) {
+        return interaction.reply({ content: '❌ Ce serveur est introuvable (le bot l\'a peut-être déjà quitté).', ephemeral: true });
+      }
+
+      const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+      const embed = new EmbedBuilder()
+        .setColor(0xED4245)
+        .setTitle(`🛠️ Gestion: ${guild.name}`)
+        .setDescription(`**ID:** ${guild.id}\n**Membres:** ${guild.memberCount}\n**Propriétaire ID:** ${guild.ownerId}`)
+        .setThumbnail(guild.iconURL({ dynamic: true }))
+        .setTimestamp();
+
+      const btnRow = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`server_leave_${guild.id}`)
+          .setLabel('Faire quitter le bot de ce serveur')
+          .setStyle(ButtonStyle.Danger)
+          .setEmoji('🚪')
+      );
+
+      await interaction.reply({ embeds: [embed], components: [btnRow], ephemeral: true });
+    } catch (err) {
+      logger.error('SelectHandlers', 'Server list select failed', { error: err.message });
+    }
+  });
+
   client.selectHandlers.set('config_select_category', async (interaction) => {
     try {
       const { handleCategorySelection } = require('../commands/config');

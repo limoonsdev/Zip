@@ -2,11 +2,11 @@
  * =====================================================
  * /SERVICES COMMAND
  * =====================================================
- * Displays available services and categories.
+ * Displays available services.
  */
 
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { SERVICES, getCategories, getServicesByCategory } = require('../config/services');
+const { SERVICES } = require('../config/services');
 const { getLogger } = require('../utils/logger');
 
 const logger = getLogger();
@@ -17,13 +17,6 @@ const logger = getLogger();
 const command = new SlashCommandBuilder()
   .setName('services')
   .setDescription('View available services')
-  .addStringOption(option =>
-    option
-      .setName('category')
-      .setDescription('Filter by category')
-      .setRequired(false)
-      .setAutocomplete(true)
-  )
   .setDMPermission(true);
 
 /**
@@ -33,21 +26,17 @@ async function execute(interaction) {
   try {
     await interaction.deferReply({ ephemeral: true });
 
-    const category = interaction.options.getString('category');
     let services = SERVICES;
-
-    if (category) {
-      services = getServicesByCategory(category);
-    }
 
     // Group by tier
     const freeServices = services.filter(s => s.tier === 'free');
     const premiumServices = services.filter(s => s.tier === 'premium');
+    const primeServices = services.filter(s => s.tier === 'prime');
 
     const embed = new EmbedBuilder()
       .setColor(0x2F3136)
       .setTitle('📱 Available Services')
-      .setDescription(category ? `Category: **${category}**` : 'All available services');
+      .setDescription('All available services');
 
     // Free services
     if (freeServices.length > 0) {
@@ -75,13 +64,25 @@ async function execute(interaction) {
       });
     }
 
+    // Prime services
+    if (primeServices.length > 0) {
+      const primeList = primeServices
+        .map(s => `💎 ${s.label}`)
+        .join('\n');
+
+      embed.addFields({
+        name: `💠 Prime Tier (${primeServices.length})`,
+        value: primeList,
+        inline: false
+      });
+    }
+
     embed.setFooter({ 
       text: `Total: ${services.length} services | Use /info <service> for details` 
     }).setTimestamp();
 
     logger.debug('Command', 'Services command executed', {
-      user: interaction.user.tag,
-      category: category || 'all'
+      user: interaction.user.tag
     });
 
     await interaction.editReply({
@@ -95,27 +96,7 @@ async function execute(interaction) {
   }
 }
 
-/**
- * Handle autocomplete
- */
-async function autocomplete(interaction) {
-  const categories = getCategories();
-  const focusedValue = interaction.options.getFocused(true);
-  
-  const filtered = categories.filter(c =>
-    c.toLowerCase().startsWith(focusedValue.value.toLowerCase())
-  );
-
-  await interaction.respond(
-    filtered.map(choice => ({
-      name: choice,
-      value: choice
-    }))
-  );
-}
-
 module.exports = {
   command,
-  execute,
-  autocomplete
+  execute
 };
