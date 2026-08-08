@@ -59,6 +59,8 @@ async function handleButton(interaction) {
       await handlePrimeStockUpload(interaction);
     } else if (customId === 'prime_stock_refresh') {
       await handlePrimeStockRefresh(interaction);
+    } else if (customId.startsWith('tool_')) {
+      await handlePrimeTools(interaction);
     } else {
       logger.warn('ButtonHandlers', `Unknown button: ${customId}`);
     }
@@ -835,9 +837,108 @@ async function handlePrimeStockRefresh(interaction) {
   }
 }
 
+/**
+ * Handle PrimeTools (VIP Utilities)
+ */
+async function handlePrimeTools(interaction) {
+  const customId = interaction.customId;
+
+  // Check VIP role
+  const config = await getOrCreateGuildConfig(interaction.guild.id);
+  const confData = config.config_data || {};
+  const vipRoleId = confData.role_premium || confData.role_prime;
+  const hasVipRole = vipRoleId ? interaction.member.roles.cache.has(vipRoleId) : false;
+  
+  const isVip = hasVipRole || 
+    (confData.cooldown_roles && Object.keys(confData.cooldown_roles).some(roleId => interaction.member.roles.cache.has(roleId)));
+
+  if (!isVip && !interaction.member.permissions.has('8')) {
+    return interaction.reply({
+      content: `${EMOJIS.ERROR} **Access Denied!** These tools are strictly reserved for V.I.P members.`,
+      ephemeral: true
+    });
+  }
+
+  try {
+    if (customId === 'tool_tempmail') {
+      await interaction.deferReply({ ephemeral: true });
+      const axios = require('axios');
+      // 1secmail API
+      const res = await axios.get('https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1');
+      const email = res.data[0];
+      
+      const embed = new EmbedBuilder()
+        .setTitle('📧 Temp Mail Generator')
+        .setDescription(`Here is your temporary email address:\n\n\`${email}\`\n\n*Note: To read emails, you would go to 1secmail.com.*`)
+        .setColor(0x00FF00);
+      
+      await interaction.editReply({ embeds: [embed] });
+      
+    } else if (customId === 'tool_passgen') {
+      const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+      let password = "";
+      for (let i = 0, n = charset.length; i < 16; ++i) {
+        password += charset.charAt(Math.floor(Math.random() * n));
+      }
+      
+      await interaction.reply({
+        content: `🔐 **Your Secure Password:**\n\`\`\`\n${password}\n\`\`\``,
+        ephemeral: true
+      });
+      
+    } else if (customId === 'tool_history') {
+      await interaction.deferReply({ ephemeral: true });
+      const userId = interaction.user.id;
+      const result = await query(
+        'SELECT service_id, combo_data, created_at FROM generated_accounts WHERE user_id = $1 ORDER BY created_at DESC LIMIT 5',
+        [userId]
+      );
+      
+      if (result.rows.length === 0) {
+        return interaction.editReply({ content: '📜 You have not generated any accounts yet.' });
+      }
+
+      let historyList = '';
+      for (const row of result.rows) {
+        historyList += `**${row.service_id.toUpperCase()}** - <t:${Math.floor(new Date(row.created_at).getTime() / 1000)}:R>\n\`${row.combo_data}\`\n\n`;
+      }
+      
+      const embed = new EmbedBuilder()
+        .setTitle('📜 Your Recent Generations')
+        .setDescription(historyList)
+        .setColor(0x3498DB);
+        
+      await interaction.editReply({ embeds: [embed] });
+      
+    } else if (customId === 'tool_2fa') {
+      const { ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+      const modal = new ModalBuilder()
+        .setCustomId('tool_2fa_modal')
+        .setTitle('2FA Authenticator');
+
+      const input = new TextInputBuilder()
+        .setCustomId('2fa_secret')
+        .setLabel('Enter 2FA Secret Key')
+        .setStyle(TextInputStyle.Short)
+        .setRequired(true);
+
+      modal.addComponents(new ActionRowBuilder().addComponents(input));
+      await interaction.showModal(modal);
+    }
+  } catch (err) {
+    logger.error('PrimeTools', 'Error executing tool', { error: err.message });
+    if (!interaction.replied && !interaction.deferred) {
+      await interaction.reply({ content: `${EMOJIS.ERROR} An error occurred while using this tool.`, ephemeral: true });
+    } else if (interaction.deferred) {
+      await interaction.editReply({ content: `${EMOJIS.ERROR} An error occurred while using this tool.` });
+    }
+  }
+}
+
 module.exports = {
   registerButtonHandlers,
-  handleButton
+  handleButton,
+  handlePrimeTools
 };
 
 
