@@ -14,6 +14,7 @@ const { formatTime } = require('../utils/timeParser');
 
 const logger = getLogger();
 const userCooldowns = new Map(); // Store cooldowns: userCooldowns.get(userId) = { free: timestamp, premium: timestamp }
+const userDailyCounts = new Map(); // Store daily counts: userDailyCounts.get(userId) = { date: 'YYYY-MM-DD', free: count, premium: count }
 
 
 function registerButtonHandlers(client) {
@@ -135,6 +136,31 @@ async function handleGenButton(interaction) {
     if (tier === 'free') userCd.free = now + cdFree;
     else if (tier === 'premium' || tier === 'prime') userCd.premium = now + cdPremium;
     userCooldowns.set(userId, userCd);
+
+    // Daily Limit Check
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const limitFree = confData.daily_limit_free !== undefined ? confData.daily_limit_free : 10;
+    const limitPremium = confData.daily_limit_premium !== undefined ? confData.daily_limit_premium : 50;
+
+    let userDaily = userDailyCounts.get(userId) || { date: today, free: 0, premium: 0 };
+    if (userDaily.date !== today) {
+      userDaily = { date: today, free: 0, premium: 0 };
+    }
+
+    if (tier === 'free' && limitFree !== 0 && userDaily.free >= limitFree) {
+      return interaction.editReply({
+        content: `${EMOJIS.ERROR} **Limite atteinte !** Tu as utilisé toutes tes générations Free d'aujourd'hui (${limitFree}/${limitFree}). Reviens demain !`
+      });
+    } else if ((tier === 'premium' || tier === 'prime') && limitPremium !== 0 && userDaily.premium >= limitPremium) {
+      return interaction.editReply({
+        content: `${EMOJIS.ERROR} **Limite atteinte !** Tu as utilisé toutes tes générations Premium d'aujourd'hui (${limitPremium}/${limitPremium}). Reviens demain !`
+      });
+    }
+
+    // Increment daily usage
+    if (tier === 'free') userDaily.free += 1;
+    else if (tier === 'premium' || tier === 'prime') userDaily.premium += 1;
+    userDailyCounts.set(userId, userDaily);
   }
 
   const service = getServiceById(serviceId);
